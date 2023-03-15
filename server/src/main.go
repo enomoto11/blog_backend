@@ -36,5 +36,7 @@ func main() {
 		})
 	})
 
+	router.Run()
+
 	defer entClient.Close()
 }
