@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Post holds the schema definition for the Post entity.
@@ -18,6 +19,8 @@ func (Post) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title"),
 		field.String("body"),
+		field.UUID("user_id", uuid.UUID{}),
+		field.Int("category_id"),
 	}
 }
 
