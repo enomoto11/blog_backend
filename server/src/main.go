@@ -1,22 +1,40 @@
 package main
 
 import (
+	"blog/ent"
+	"blog/ent/migrate"
 	"context"
+	"fmt"
 	"log"
+	"net/http"
+	"os"
 
-	"entdemo/ent"
-
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	client, err := ent.Open("mysql", "<user>:<pass>@tcp(<host>:<port>)/<database>?parseTime=True")
+	path := fmt.Sprintf("%s:%s@tcp(db:3306)/%s?charset=utf8&parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
+	entClient, err := ent.Open("mysql", path)
 	if err != nil {
-		log.Fatalf("failed opening connection to mysql: %v", err)
+		log.Fatalf("failed connect to mysql: %v", err)
 	}
-	defer client.Close()
-	// Run the auto migration tool.
-	if err := client.Schema.Create(context.Background()); err != nil {
+
+	ctx := context.Background()
+	if err := entClient.Schema.Create(
+		ctx,
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true),
+	); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
+
+	router := gin.Default()
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"gin": "root",
+		})
+	})
+
+	defer entClient.Close()
 }
