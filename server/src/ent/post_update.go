@@ -3,8 +3,10 @@
 package ent
 
 import (
+	"blog/ent/category"
 	"blog/ent/post"
 	"blog/ent/predicate"
+	"blog/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -13,6 +15,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // PostUpdate is the builder for updating Post entities.
@@ -66,9 +69,43 @@ func (pu *PostUpdate) SetBody(s string) *PostUpdate {
 	return pu
 }
 
+// SetUserID sets the "user_id" field.
+func (pu *PostUpdate) SetUserID(u uuid.UUID) *PostUpdate {
+	pu.mutation.SetUserID(u)
+	return pu
+}
+
+// SetCategoryID sets the "category_id" field.
+func (pu *PostUpdate) SetCategoryID(i int) *PostUpdate {
+	pu.mutation.SetCategoryID(i)
+	return pu
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (pu *PostUpdate) SetUser(u *User) *PostUpdate {
+	return pu.SetUserID(u.ID)
+}
+
+// SetCategory sets the "category" edge to the Category entity.
+func (pu *PostUpdate) SetCategory(c *Category) *PostUpdate {
+	return pu.SetCategoryID(c.ID)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (pu *PostUpdate) ClearUser() *PostUpdate {
+	pu.mutation.ClearUser()
+	return pu
+}
+
+// ClearCategory clears the "category" edge to the Category entity.
+func (pu *PostUpdate) ClearCategory() *PostUpdate {
+	pu.mutation.ClearCategory()
+	return pu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -107,7 +144,21 @@ func (pu *PostUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (pu *PostUpdate) check() error {
+	if _, ok := pu.mutation.UserID(); pu.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Post.user"`)
+	}
+	if _, ok := pu.mutation.CategoryID(); pu.mutation.CategoryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Post.category"`)
+	}
+	return nil
+}
+
 func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := pu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(post.Table, post.Columns, sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID))
 	if ps := pu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -130,6 +181,64 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
+	}
+	if pu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.UserTable,
+			Columns: []string{post.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.UserTable,
+			Columns: []string{post.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: []string{post.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: []string{post.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -189,9 +298,43 @@ func (puo *PostUpdateOne) SetBody(s string) *PostUpdateOne {
 	return puo
 }
 
+// SetUserID sets the "user_id" field.
+func (puo *PostUpdateOne) SetUserID(u uuid.UUID) *PostUpdateOne {
+	puo.mutation.SetUserID(u)
+	return puo
+}
+
+// SetCategoryID sets the "category_id" field.
+func (puo *PostUpdateOne) SetCategoryID(i int) *PostUpdateOne {
+	puo.mutation.SetCategoryID(i)
+	return puo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (puo *PostUpdateOne) SetUser(u *User) *PostUpdateOne {
+	return puo.SetUserID(u.ID)
+}
+
+// SetCategory sets the "category" edge to the Category entity.
+func (puo *PostUpdateOne) SetCategory(c *Category) *PostUpdateOne {
+	return puo.SetCategoryID(c.ID)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (puo *PostUpdateOne) ClearUser() *PostUpdateOne {
+	puo.mutation.ClearUser()
+	return puo
+}
+
+// ClearCategory clears the "category" edge to the Category entity.
+func (puo *PostUpdateOne) ClearCategory() *PostUpdateOne {
+	puo.mutation.ClearCategory()
+	return puo
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -243,7 +386,21 @@ func (puo *PostUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (puo *PostUpdateOne) check() error {
+	if _, ok := puo.mutation.UserID(); puo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Post.user"`)
+	}
+	if _, ok := puo.mutation.CategoryID(); puo.mutation.CategoryCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Post.category"`)
+	}
+	return nil
+}
+
 func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
+	if err := puo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(post.Table, post.Columns, sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID))
 	id, ok := puo.mutation.ID()
 	if !ok {
@@ -283,6 +440,64 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
+	}
+	if puo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.UserTable,
+			Columns: []string{post.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.UserTable,
+			Columns: []string{post.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.CategoryCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: []string{post.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: []string{post.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Post{config: puo.config}
 	_spec.Assign = _node.assignValues

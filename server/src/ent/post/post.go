@@ -23,8 +23,30 @@ const (
 	FieldTitle = "title"
 	// FieldBody holds the string denoting the body field in the database.
 	FieldBody = "body"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldCategoryID holds the string denoting the category_id field in the database.
+	FieldCategoryID = "category_id"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
+	// EdgeCategory holds the string denoting the category edge name in mutations.
+	EdgeCategory = "category"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "posts"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_id"
+	// CategoryTable is the table that holds the category relation/edge.
+	CategoryTable = "posts"
+	// CategoryInverseTable is the table name for the Category entity.
+	// It exists in this package in order to avoid circular dependency with the "category" package.
+	CategoryInverseTable = "categories"
+	// CategoryColumn is the table column denoting the category relation/edge.
+	CategoryColumn = "category_id"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -35,6 +57,8 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldTitle,
 	FieldBody,
+	FieldUserID,
+	FieldCategoryID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

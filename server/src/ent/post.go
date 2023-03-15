@@ -3,7 +3,9 @@
 package ent
 
 import (
+	"blog/ent/category"
 	"blog/ent/post"
+	"blog/ent/user"
 	"fmt"
 	"strings"
 	"time"
@@ -27,6 +29,50 @@ type Post struct {
 	Title string `json:"title,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID uuid.UUID `json:"user_id,omitempty"`
+	// CategoryID holds the value of the "category_id" field.
+	CategoryID int `json:"category_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the PostQuery when eager-loading is set.
+	Edges PostEdges `json:"edges"`
+}
+
+// PostEdges holds the relations/edges for other nodes in the graph.
+type PostEdges struct {
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
+	// Category holds the value of the category edge.
+	Category *Category `json:"category,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
+// CategoryOrErr returns the Category value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) CategoryOrErr() (*Category, error) {
+	if e.loadedTypes[1] {
+		if e.Category == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: category.Label}
+		}
+		return e.Category, nil
+	}
+	return nil, &NotLoadedError{edge: "category"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -34,11 +80,13 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case post.FieldCategoryID:
+			values[i] = new(sql.NullInt64)
 		case post.FieldTitle, post.FieldBody:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID:
+		case post.FieldID, post.FieldUserID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Post", columns[i])
@@ -91,9 +139,31 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.Body = value.String
 			}
+		case post.FieldUserID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value != nil {
+				po.UserID = *value
+			}
+		case post.FieldCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field category_id", values[i])
+			} else if value.Valid {
+				po.CategoryID = int(value.Int64)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryUser queries the "user" edge of the Post entity.
+func (po *Post) QueryUser() *UserQuery {
+	return NewPostClient(po.config).QueryUser(po)
+}
+
+// QueryCategory queries the "category" edge of the Post entity.
+func (po *Post) QueryCategory() *CategoryQuery {
+	return NewPostClient(po.config).QueryCategory(po)
 }
 
 // Update returns a builder for updating this Post.
@@ -133,6 +203,12 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("body=")
 	builder.WriteString(po.Body)
+	builder.WriteString(", ")
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.UserID))
+	builder.WriteString(", ")
+	builder.WriteString("category_id=")
+	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
 	builder.WriteByte(')')
 	return builder.String()
 }

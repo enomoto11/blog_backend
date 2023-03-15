@@ -4,6 +4,7 @@ package ent
 
 import (
 	"blog/ent/category"
+	"blog/ent/post"
 	"blog/ent/predicate"
 	"context"
 	"errors"
@@ -13,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // CategoryUpdate is the builder for updating Category entities.
@@ -60,9 +62,45 @@ func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
 	return cu
 }
 
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (cu *CategoryUpdate) AddPostIDs(ids ...uuid.UUID) *CategoryUpdate {
+	cu.mutation.AddPostIDs(ids...)
+	return cu
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (cu *CategoryUpdate) AddPosts(p ...*Post) *CategoryUpdate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cu.AddPostIDs(ids...)
+}
+
 // Mutation returns the CategoryMutation object of the builder.
 func (cu *CategoryUpdate) Mutation() *CategoryMutation {
 	return cu.mutation
+}
+
+// ClearPosts clears all "posts" edges to the Post entity.
+func (cu *CategoryUpdate) ClearPosts() *CategoryUpdate {
+	cu.mutation.ClearPosts()
+	return cu
+}
+
+// RemovePostIDs removes the "posts" edge to Post entities by IDs.
+func (cu *CategoryUpdate) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdate {
+	cu.mutation.RemovePostIDs(ids...)
+	return cu
+}
+
+// RemovePosts removes "posts" edges to Post entities.
+func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cu.RemovePostIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -122,6 +160,51 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 	}
+	if cu.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cu.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{category.Label}
@@ -174,9 +257,45 @@ func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
 	return cuo
 }
 
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (cuo *CategoryUpdateOne) AddPostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
+	cuo.mutation.AddPostIDs(ids...)
+	return cuo
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (cuo *CategoryUpdateOne) AddPosts(p ...*Post) *CategoryUpdateOne {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cuo.AddPostIDs(ids...)
+}
+
 // Mutation returns the CategoryMutation object of the builder.
 func (cuo *CategoryUpdateOne) Mutation() *CategoryMutation {
 	return cuo.mutation
+}
+
+// ClearPosts clears all "posts" edges to the Post entity.
+func (cuo *CategoryUpdateOne) ClearPosts() *CategoryUpdateOne {
+	cuo.mutation.ClearPosts()
+	return cuo
+}
+
+// RemovePostIDs removes the "posts" edge to Post entities by IDs.
+func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...uuid.UUID) *CategoryUpdateOne {
+	cuo.mutation.RemovePostIDs(ids...)
+	return cuo
+}
+
+// RemovePosts removes "posts" edges to Post entities.
+func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cuo.RemovePostIDs(ids...)
 }
 
 // Where appends a list predicates to the CategoryUpdate builder.
@@ -265,6 +384,51 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
+	}
+	if cuo.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cuo.mutation.PostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Category{config: cuo.config}
 	_spec.Assign = _node.assignValues

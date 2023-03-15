@@ -3,7 +3,9 @@
 package ent
 
 import (
+	"blog/ent/category"
 	"blog/ent/post"
+	"blog/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -75,6 +77,18 @@ func (pc *PostCreate) SetBody(s string) *PostCreate {
 	return pc
 }
 
+// SetUserID sets the "user_id" field.
+func (pc *PostCreate) SetUserID(u uuid.UUID) *PostCreate {
+	pc.mutation.SetUserID(u)
+	return pc
+}
+
+// SetCategoryID sets the "category_id" field.
+func (pc *PostCreate) SetCategoryID(i int) *PostCreate {
+	pc.mutation.SetCategoryID(i)
+	return pc
+}
+
 // SetID sets the "id" field.
 func (pc *PostCreate) SetID(u uuid.UUID) *PostCreate {
 	pc.mutation.SetID(u)
@@ -87,6 +101,16 @@ func (pc *PostCreate) SetNillableID(u *uuid.UUID) *PostCreate {
 		pc.SetID(*u)
 	}
 	return pc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (pc *PostCreate) SetUser(u *User) *PostCreate {
+	return pc.SetUserID(u.ID)
+}
+
+// SetCategory sets the "category" edge to the Category entity.
+func (pc *PostCreate) SetCategory(c *Category) *PostCreate {
+	return pc.SetCategoryID(c.ID)
 }
 
 // Mutation returns the PostMutation object of the builder.
@@ -152,6 +176,18 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.Body(); !ok {
 		return &ValidationError{Name: "body", err: errors.New(`ent: missing required field "Post.body"`)}
 	}
+	if _, ok := pc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Post.user_id"`)}
+	}
+	if _, ok := pc.mutation.CategoryID(); !ok {
+		return &ValidationError{Name: "category_id", err: errors.New(`ent: missing required field "Post.category_id"`)}
+	}
+	if _, ok := pc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Post.user"`)}
+	}
+	if _, ok := pc.mutation.CategoryID(); !ok {
+		return &ValidationError{Name: "category", err: errors.New(`ent: missing required edge "Post.category"`)}
+	}
 	return nil
 }
 
@@ -206,6 +242,40 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 		_node.Body = value
+	}
+	if nodes := pc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.UserTable,
+			Columns: []string{post.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.CategoryTable,
+			Columns: []string{post.CategoryColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CategoryID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

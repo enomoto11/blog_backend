@@ -4,6 +4,7 @@ package ent
 
 import (
 	"blog/ent/category"
+	"blog/ent/post"
 	"context"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // CategoryCreate is the builder for creating a Category entity.
@@ -72,6 +74,21 @@ func (cc *CategoryCreate) SetName(s string) *CategoryCreate {
 func (cc *CategoryCreate) SetID(i int) *CategoryCreate {
 	cc.mutation.SetID(i)
 	return cc
+}
+
+// AddPostIDs adds the "posts" edge to the Post entity by IDs.
+func (cc *CategoryCreate) AddPostIDs(ids ...uuid.UUID) *CategoryCreate {
+	cc.mutation.AddPostIDs(ids...)
+	return cc
+}
+
+// AddPosts adds the "posts" edges to the Post entity.
+func (cc *CategoryCreate) AddPosts(p ...*Post) *CategoryCreate {
+	ids := make([]uuid.UUID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddPostIDs(ids...)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
@@ -182,6 +199,22 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.PostsTable,
+			Columns: []string{category.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
