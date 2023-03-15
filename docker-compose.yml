@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  go:
+    container_name: blog_server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - 8080:8080
+    env_file:
+      - ./db/.env
+    depends_on:
+      - db
+    volumes:
+      - type: bind
+        source: ./server/src
+        target: /go/src
+
+  db:
+    container_name: blog_db
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    tty: true
+    platform: linux/x86_64
+    ports:
+      - 3306:3306
+    env_file:
+      - ./db/.env
+    volumes:
+      - type: volume
+        source: blog_db
+        target: /var/lib/mysql
+
+volumes:
+  blog_db:
+    name: blog_db
