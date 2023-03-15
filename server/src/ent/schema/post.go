@@ -4,6 +4,7 @@ import (
 	"blog/ent/schema/mixin"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -22,7 +23,10 @@ func (Post) Fields() []ent.Field {
 
 // Edges of the Post.
 func (Post) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).Ref("posts").Unique().Field("user_id").Required(),
+		edge.From("category", Category.Type).Ref("posts").Unique().Field("category_id").Required(),
+	}
 }
 
 func (Post) Mixin() []ent.Mixin {
