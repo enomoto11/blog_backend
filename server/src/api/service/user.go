@@ -25,8 +25,8 @@ func NewUserService(createUserRepo repository.UserRepository) UserService {
 
 func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError) {
 	team, err := model.NewUser(
-		model.NewUserFirstName(rb.FirstName),
-		model.NewUserLastName(rb.LastName),
+		model.NewUserFirstName(rb.First_name),
+		model.NewUserLastName(rb.Last_name),
 		model.NewUserEmail(rb.Email),
 		model.NewUserPassword(rb.Password),
 	)
