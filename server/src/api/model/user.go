@@ -58,6 +58,22 @@ func NewUserPassword(password string) NewUserOption {
 	}
 }
 
+func (user *User) GetID() uuid.UUID {
+	return user.id
+}
+func (user *User) GetFirstName() string {
+	return user.first_name
+}
+func (user *User) GetLastName() string {
+	return user.last_name
+}
+func (user *User) GetEmail() string {
+	return user.email
+}
+func (user *User) GetPassword() string {
+	return user.password
+}
+
 func (u *User) validate() *ValidationErrors {
 	var errors []*ValidationError
 
