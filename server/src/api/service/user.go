@@ -10,7 +10,7 @@ import (
 )
 
 type UserService interface {
-	CreateUser(ctx *context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError)
+	CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError)
 }
 
 type userService struct {
@@ -23,7 +23,7 @@ func NewUserService(createUserRepo repository.UserRepository) UserService {
 	}
 }
 
-func (s *userService) CreateUser(ctx *context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError) {
+func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError) {
 	team, err := model.NewUser(
 		model.NewUserFirstName(rb.FirstName),
 		model.NewUserLastName(rb.LastName),
@@ -35,7 +35,7 @@ func (s *userService) CreateUser(ctx *context.Context, rb request.CreateUserRequ
 		return nil, internalError
 	}
 
-	result, err := s.createUserRepo.Create(*ctx, team)
+	result, err := s.createUserRepo.Create(ctx, team)
 	if err != nil {
 		internalError := error.NewInternalError(http.StatusInternalServerError, err)
 		return nil, internalError
