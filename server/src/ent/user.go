@@ -14,7 +14,7 @@ import (
 
 // User is the model entity for the User schema.
 type User struct {
-	config `json:"-"`
+	config `json:"-" validate:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -28,7 +28,7 @@ type User struct {
 	// LastName holds the value of the "last_name" field.
 	LastName string `json:"last_name,omitempty"`
 	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	Email string `json:"email,omitempty" validate:"email"`
 	// Password holds the value of the "Password" field.
 	Password string `json:"Password,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.

@@ -18,7 +18,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("first_name"),
 		field.String("last_name"),
-		field.String("email"),
+		field.String("email").StructTag(`validate:"email"`),
 		field.String("Password"),
 	}
 }
