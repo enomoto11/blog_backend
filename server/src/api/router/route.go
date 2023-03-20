@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func InitControllers() (*gin.Engine, *ent.Client) {
