@@ -14,23 +14,32 @@ type PostService interface {
 }
 
 type postService struct {
-	postRepo repository.PostRepository
-	userRepo repository.UserRepository
+	postRepo     repository.PostRepository
+	userRepo     repository.UserRepository
+	categoryRepo repository.CategoryRepository
 }
 
 func NewPostService(
 	postRepo repository.PostRepository,
 	userRepo repository.UserRepository,
+	categoryRepo repository.CategoryRepository,
 ) PostService {
 	return &postService{
 		postRepo,
 		userRepo,
+		categoryRepo,
 	}
 }
 
 func (s *postService) CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.POSTPostModel, error) {
 	user, err := s.userRepo.FindByID(ctx, rb.UserID)
 	if user == nil || err != nil {
+		internalError := error2.NewInternalError(http.StatusBadRequest, err)
+		return nil, internalError
+	}
+
+	category, err := s.categoryRepo.FindByID(ctx, rb.CategoryID)
+	if category == nil || err != nil {
 		internalError := error2.NewInternalError(http.StatusBadRequest, err)
 		return nil, internalError
 	}

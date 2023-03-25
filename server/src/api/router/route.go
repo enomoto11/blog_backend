@@ -56,7 +56,11 @@ func setUpController(entClient *ent.Client) initializedContrllers {
 
 	userService := service.NewUserService(userRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
-	postService := service.NewPostService(postRepo, userRepo)
+	postService := service.NewPostService(
+		postRepo,
+		userRepo,
+		categoryRepo,
+	)
 
 	userController := controller.NewUserController(userService)
 	categoryController := controller.NewCategoryController(categoryService)
