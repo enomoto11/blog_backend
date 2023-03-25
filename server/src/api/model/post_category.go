@@ -1,6 +1,8 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	postCategoryNameMaxLength = 20
