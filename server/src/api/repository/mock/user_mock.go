@@ -36,10 +36,10 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m_2 *MockUserRepository) Create(ctx context.Context, m *model.User) (*model.User, error) {
+func (m_2 *MockUserRepository) Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error) {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "Create", ctx, m)
-	ret0, _ := ret[0].(*model.User)
+	ret0, _ := ret[0].(*model.POSTUserModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -48,4 +48,19 @@ func (m_2 *MockUserRepository) Create(ctx context.Context, m *model.User) (*mode
 func (mr *MockUserRepositoryMockRecorder) Create(ctx, m interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUserRepository)(nil).Create), ctx, m)
+}
+
+// FindAll mocks base method.
+func (m *MockUserRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret0, _ := ret[0].([]*model.GETUserModel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAll indicates an expected call of FindAll.
+func (mr *MockUserRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUserRepository)(nil).FindAll), ctx)
 }

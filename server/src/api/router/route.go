@@ -36,6 +36,7 @@ func InitControllers() (*gin.Engine, *ent.Client) {
 	controller := setUpController(entClient)
 
 	controller.CreateUserController(router)
+	controller.FindAllUserController(router)
 
 	return router, entClient
 }

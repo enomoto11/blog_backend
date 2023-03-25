@@ -2,7 +2,7 @@ package service
 
 import (
 	"blog/api/controller/request"
-	"blog/api/error"
+	error2 "blog/api/error"
 	"blog/api/model"
 	"blog/api/repository"
 	"context"
@@ -10,36 +10,48 @@ import (
 )
 
 type UserService interface {
-	CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError)
+	CreateUser(ctx context.Context, rb request.POSTUserRequestBody) (*model.POSTUserModel, error)
+	FindAllUsers(ctx context.Context) ([]*model.GETUserModel, error)
 }
 
 type userService struct {
-	createUserRepo repository.UserRepository
+	userRepo repository.UserRepository
 }
 
-func NewUserService(createUserRepo repository.UserRepository) UserService {
+func NewUserService(userRepo repository.UserRepository) UserService {
 	return &userService{
-		createUserRepo,
+		userRepo,
 	}
 }
 
-func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, *error.InternalError) {
-	team, err := model.NewUser(
-		model.NewUserFirstName(rb.First_name),
-		model.NewUserLastName(rb.Last_name),
-		model.NewUserEmail(rb.Email),
-		model.NewUserPassword(rb.Password),
+func (s *userService) CreateUser(ctx context.Context, rb request.POSTUserRequestBody) (*model.POSTUserModel, error) {
+	user, err := model.NewPOSTUser(
+		model.NewPOSTUserFirstName(rb.FirstName),
+		model.NewPOSTUserLastName(rb.LastName),
+		model.NewPOSTUserEmail(rb.Email),
+		model.NewPOSTUserPassword(rb.Password),
 	)
 	if err != nil {
-		internalError := error.NewInternalError(http.StatusInternalServerError, err)
+		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
 		return nil, internalError
 	}
 
-	result, err := s.createUserRepo.Create(ctx, team)
+	result, err := s.userRepo.Create(ctx, user)
 	if err != nil {
-		internalError := error.NewInternalError(http.StatusInternalServerError, err)
+		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
 		return nil, internalError
 	}
 
 	return result, nil
+}
+
+func (s *userService) FindAllUsers(ctx context.Context) ([]*model.GETUserModel, error) {
+	users, err := s.userRepo.FindAll(ctx)
+
+	if err != nil {
+		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
+		return nil, internalError
+	}
+
+	return users, nil
 }

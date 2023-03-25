@@ -1,8 +1,8 @@
 package request
 
-type CreateUserRequestBody struct {
-	First_name string
-	Last_name  string
-	Email      string
-	Password   string
+type POSTUserRequestBody struct {
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
 }

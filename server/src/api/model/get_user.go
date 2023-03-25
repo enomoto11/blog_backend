@@ -1,19 +1,22 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"regexp"
 
-type User struct {
+	"github.com/google/uuid"
+)
+
+type GETUserModel struct {
 	id         uuid.UUID
 	first_name string
 	last_name  string
 	email      string
-	password   string
 }
 
-type NewUserOption func(u *User)
+type NewGETUserOption func(u *GETUserModel)
 
-func NewUser(opts ...NewUserOption) (*User, error) {
-	user := &User{}
+func NewGETUser(opts ...NewGETUserOption) (*GETUserModel, error) {
+	user := &GETUserModel{}
 
 	// user作成時にデフォルトでuuidを設定。上書き可能。
 	user.id = uuid.Must(uuid.NewRandom())
@@ -28,53 +31,44 @@ func NewUser(opts ...NewUserOption) (*User, error) {
 	return user, nil
 }
 
-func NewUserID(id uuid.UUID) NewUserOption {
-	return func(u *User) {
+func NewGETUserID(id uuid.UUID) NewGETUserOption {
+	return func(u *GETUserModel) {
 		u.id = id
 	}
 }
 
-func NewUserFirstName(first_name string) NewUserOption {
-	return func(u *User) {
+func NewGETUserFirstName(first_name string) NewGETUserOption {
+	return func(u *GETUserModel) {
 		u.first_name = first_name
 	}
 }
 
-func NewUserLastName(last_name string) NewUserOption {
-	return func(u *User) {
+func NewGETUserLastName(last_name string) NewGETUserOption {
+	return func(u *GETUserModel) {
 		u.last_name = last_name
 	}
 }
 
-func NewUserEmail(email string) NewUserOption {
-	return func(u *User) {
+func NewGETUserEmail(email string) NewGETUserOption {
+	return func(u *GETUserModel) {
 		u.email = email
 	}
 }
 
-func NewUserPassword(password string) NewUserOption {
-	return func(u *User) {
-		u.password = password
-	}
-}
-
-func (user *User) GetID() uuid.UUID {
+func (user *GETUserModel) GetID() uuid.UUID {
 	return user.id
 }
-func (user *User) GetFirstName() string {
+func (user *GETUserModel) GetFirstName() string {
 	return user.first_name
 }
-func (user *User) GetLastName() string {
+func (user *GETUserModel) GetLastName() string {
 	return user.last_name
 }
-func (user *User) GetEmail() string {
+func (user *GETUserModel) GetEmail() string {
 	return user.email
 }
-func (user *User) GetPassword() string {
-	return user.password
-}
 
-func (u *User) validate() *ValidationErrors {
+func (u *GETUserModel) validate() *ValidationErrors {
 	var errors []*ValidationError
 
 	if ve := u.isIDValid(); ve != nil {
@@ -89,41 +83,36 @@ func (u *User) validate() *ValidationErrors {
 	if ve := u.isUserEmailValid(); ve != nil {
 		errors = append(errors, ve)
 	}
-	if ve := u.isUserPasswordValid(); ve != nil {
-		errors = append(errors, ve)
-	}
 
 	return validationErrorSliceToValidationErrors(errors)
 
 }
 
-func (u *User) isIDValid() *ValidationError {
+func (u *GETUserModel) isIDValid() *ValidationError {
 	if u.id == uuid.Nil {
 		return NewValidationError("empty UUID in user ID is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserFirstNameValid() *ValidationError {
+func (u *GETUserModel) isUserFirstNameValid() *ValidationError {
 	if u.first_name == "" {
 		return NewValidationError("empty string in first name is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserLastNameValid() *ValidationError {
+func (u *GETUserModel) isUserLastNameValid() *ValidationError {
 	if u.last_name == "" {
 		return NewValidationError("empty string in last name is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserEmailValid() *ValidationError {
+func (u *GETUserModel) isUserEmailValid() *ValidationError {
 	if u.email == "" {
 		return NewValidationError("empty string in email is not allowed")
 	}
-	return nil
-}
-func (u *User) isUserPasswordValid() *ValidationError {
-	if u.password == "" {
-		return NewValidationError("empty string in password is not allowed")
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	if !emailRegex.MatchString(u.email) {
+		return NewValidationError("invalid email format")
 	}
 	return nil
 }
