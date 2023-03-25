@@ -51,11 +51,11 @@ func (mr *MockUserRepositoryMockRecorder) Create(ctx, m interface{}) *gomock.Cal
 }
 
 // FindAll mocks base method.
-func (m *MockUserRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, []error) {
+func (m *MockUserRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindAll", ctx)
 	ret0, _ := ret[0].([]*model.GETUserModel)
-	ret1, _ := ret[1].([]error)
+	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
