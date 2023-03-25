@@ -20,7 +20,6 @@ func NewCategoryRepository(client *ent.Client) CategoryRepository {
 
 func (r *categoryRepository) Create(ctx context.Context, m *model.POSTCategoryModel) (*model.POSTCategoryModel, error) {
 	entity, err := r.client.Category.Create().
-		SetID(m.GetID()).
 		SetName(m.GetName()).
 		Save(ctx)
 
@@ -37,5 +36,5 @@ func categoryModelFromEntity(entity *ent.Category) (*model.POSTCategoryModel, er
 		model.NewPOSTCategoryName(entity.Name),
 	}
 
-	return model.NewPOSTCategory(opts...)
+	return model.NewPOSTCategoryAfterCreated(opts...)
 }

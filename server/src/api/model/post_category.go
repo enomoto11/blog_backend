@@ -9,26 +9,39 @@ const (
 )
 
 type POSTCategoryModel struct {
-	id   int
+	id   int64
 	name string
 }
 
 type NewPOSTCategoryOption func(c *POSTCategoryModel)
 
-func NewPOSTCategory(opts ...NewPOSTCategoryOption) (*POSTCategoryModel, error) {
+func NewPOSTCategoryBeforeCreated(opts ...NewPOSTCategoryOption) (*POSTCategoryModel, error) {
 	category := &POSTCategoryModel{}
 
 	for _, opt := range opts {
 		opt(category)
 	}
-	if err := category.validate(); err != nil {
+	if err := category.validate(false); err != nil {
 		return nil, NewValidationError(err.Error())
 	}
 
 	return category, nil
 }
 
-func NewPOSTCategoryID(id int) NewPOSTCategoryOption {
+func NewPOSTCategoryAfterCreated(opts ...NewPOSTCategoryOption) (*POSTCategoryModel, error) {
+	category := &POSTCategoryModel{}
+
+	for _, opt := range opts {
+		opt(category)
+	}
+	if err := category.validate(true); err != nil {
+		return nil, NewValidationError(err.Error())
+	}
+
+	return category, nil
+}
+
+func NewPOSTCategoryID(id int64) NewPOSTCategoryOption {
 	return func(c *POSTCategoryModel) {
 		c.id = id
 	}
@@ -40,19 +53,22 @@ func NewPOSTCategoryName(name string) NewPOSTCategoryOption {
 	}
 }
 
-func (category *POSTCategoryModel) GetID() int {
+func (category *POSTCategoryModel) GetID() int64 {
 	return category.id
 }
 func (category *POSTCategoryModel) GetName() string {
 	return category.name
 }
 
-func (category *POSTCategoryModel) validate() *ValidationErrors {
+func (category *POSTCategoryModel) validate(shouldValidateID bool) *ValidationErrors {
 	var errors []*ValidationError
 
-	if ve := category.isIDValid(); ve != nil {
-		errors = append(errors, ve)
+	if shouldValidateID {
+		if ve := category.isIDValid(); ve != nil {
+			errors = append(errors, ve)
+		}
 	}
+
 	if ve := category.isNameValid(); ve != nil {
 		errors = append(errors, ve)
 	}

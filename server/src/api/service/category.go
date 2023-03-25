@@ -24,7 +24,7 @@ func NewCategoryService(categoryRepo repository.CategoryRepository) CategoryServ
 }
 
 func (s *categoryService) CreateCategory(ctx context.Context, rb request.POSTCategoryRequestBody) (*model.POSTCategoryModel, error) {
-	category, err := model.NewPOSTCategory(
+	category, err := model.NewPOSTCategoryBeforeCreated(
 		model.NewPOSTCategoryName(rb.Name),
 	)
 	if err != nil {
