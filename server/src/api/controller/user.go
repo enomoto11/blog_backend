@@ -27,7 +27,7 @@ func NewUserController(teamService service.UserService) UserController {
 
 func (c *userController) FindAllUserController(r *gin.Engine) {
 	r.GET("users", func(ctx *gin.Context) {
-		result, err := c.teamService.FindAllUser(ctx)
+		result, err := c.teamService.FindAllUsers(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

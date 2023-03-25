@@ -11,7 +11,7 @@ import (
 
 type UserService interface {
 	CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, error)
-	FindAllUser(ctx context.Context) ([]*model.User, error)
+	FindAllUsers(ctx context.Context) ([]*model.User, error)
 }
 
 type userService struct {
@@ -45,7 +45,7 @@ func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserReque
 	return result, nil
 }
 
-func (s *userService) FindAllUser(ctx context.Context) ([]*model.User, error) {
+func (s *userService) FindAllUsers(ctx context.Context) ([]*model.User, error) {
 	users, errs := s.userRepo.FindAll(ctx)
 	if errs != nil {
 		internalError := error2.NewInternalError(http.StatusInternalServerError, errs[0])
