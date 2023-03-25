@@ -32,7 +32,7 @@ func (s *userService) CreateUser(ctx context.Context, rb request.POSTUserRequest
 		model.NewPOSTUserPassword(rb.Password),
 	)
 	if err != nil {
-		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
+		internalError := error2.NewInternalError(http.StatusBadRequest, err)
 		return nil, internalError
 	}
 
