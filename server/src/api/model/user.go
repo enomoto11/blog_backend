@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"regexp"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
 	id         uuid.UUID
@@ -118,6 +122,10 @@ func (u *User) isUserLastNameValid() *ValidationError {
 func (u *User) isUserEmailValid() *ValidationError {
 	if u.email == "" {
 		return NewValidationError("empty string in email is not allowed")
+	}
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	if !emailRegex.MatchString(u.email) {
+		return NewValidationError("invalid email format")
 	}
 	return nil
 }
