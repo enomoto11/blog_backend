@@ -36,10 +36,10 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m_2 *MockUserRepository) Create(ctx context.Context, m *model.User) (*model.User, error) {
+func (m_2 *MockUserRepository) Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error) {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "Create", ctx, m)
-	ret0, _ := ret[0].(*model.User)
+	ret0, _ := ret[0].(*model.POSTUserModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockUserRepositoryMockRecorder) Create(ctx, m interface{}) *gomock.Cal
 }
 
 // FindAll mocks base method.
-func (m *MockUserRepository) FindAll(ctx context.Context) ([]*model.User, []error) {
+func (m *MockUserRepository) FindAll(ctx context.Context) ([]*model.POSTUserModel, []error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindAll", ctx)
-	ret0, _ := ret[0].([]*model.User)
+	ret0, _ := ret[0].([]*model.POSTUserModel)
 	ret1, _ := ret[1].([]error)
 	return ret0, ret1
 }

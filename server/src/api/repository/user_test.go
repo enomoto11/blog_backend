@@ -13,26 +13,26 @@ import (
 
 func Test_UserRepository_Create(t *testing.T) {
 	type args struct {
-		m   *model.User
+		m   *model.POSTUserModel
 		ctx context.Context
 	}
 
 	id := uuid.New()
 	ctx := context.Background()
 
-	m1, err1 := model.NewUser(
-		model.NewUserID(id),
-		model.NewUserFirstName("悟"),
-		model.NewUserLastName("五条"),
-		model.NewUserEmail("s.gojo@gmail.com"),
-		model.NewUserPassword("jujutsukaisenn"),
+	m1, err1 := model.NewPOSTUser(
+		model.NewPOSTUserID(id),
+		model.NewPOSTUserFirstName("悟"),
+		model.NewPOSTUserLastName("五条"),
+		model.NewPOSTUserEmail("s.gojo@gmail.com"),
+		model.NewPOSTUserPassword("jujutsukaisenn"),
 	)
 	require.NoError(t, err1)
 
 	tests := []struct {
 		name    string
 		args    args
-		matcher func(t *testing.T, expect *model.User, got *model.User, err error)
+		matcher func(t *testing.T, expect *model.POSTUserModel, got *model.POSTUserModel, err error)
 	}{
 		{
 			name: "正常系：五条悟をユーザー登録する",
@@ -40,7 +40,7 @@ func Test_UserRepository_Create(t *testing.T) {
 				m:   m1,
 				ctx: ctx,
 			},
-			matcher: func(t *testing.T, expected *model.User, got *model.User, err error) {
+			matcher: func(t *testing.T, expected *model.POSTUserModel, got *model.POSTUserModel, err error) {
 				assert.NoError(t, err)
 				assert.Equal(t, expected, got)
 			},

@@ -7,8 +7,8 @@ import (
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, m *model.User) (*model.User, error)
-	FindAll(ctx context.Context) ([]*model.User, []error)
+	Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error)
+	FindAll(ctx context.Context) ([]*model.POSTUserModel, []error)
 }
 
 type userRepository struct {
@@ -19,7 +19,7 @@ func NewUserRepository(client *ent.Client) UserRepository {
 	return &userRepository{client}
 }
 
-func (r *userRepository) Create(ctx context.Context, m *model.User) (*model.User, error) {
+func (r *userRepository) Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error) {
 	entity, err := r.client.User.Create().
 		SetID(m.GetID()).
 		SetFirstName(m.GetFirstName()).
@@ -35,7 +35,7 @@ func (r *userRepository) Create(ctx context.Context, m *model.User) (*model.User
 	return teamModelFromEntity(entity)
 }
 
-func (r *userRepository) FindAll(ctx context.Context) ([]*model.User, []error) {
+func (r *userRepository) FindAll(ctx context.Context) ([]*model.POSTUserModel, []error) {
 	entities, err := r.client.User.Query().All(ctx)
 
 	if err != nil {
@@ -47,30 +47,30 @@ func (r *userRepository) FindAll(ctx context.Context) ([]*model.User, []error) {
 	return teamModelsFromEntities(entities)
 }
 
-func teamModelFromEntity(entity *ent.User) (*model.User, error) {
-	opts := []model.NewUserOption{
-		model.NewUserID(entity.ID),
-		model.NewUserFirstName(entity.FirstName),
-		model.NewUserLastName(entity.LastName),
-		model.NewUserEmail(entity.Email),
-		model.NewUserPassword(entity.Password),
+func teamModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
+	opts := []model.NewPOSTUserOption{
+		model.NewPOSTUserID(entity.ID),
+		model.NewPOSTUserFirstName(entity.FirstName),
+		model.NewPOSTUserLastName(entity.LastName),
+		model.NewPOSTUserEmail(entity.Email),
+		model.NewPOSTUserPassword(entity.Password),
 	}
 
-	return model.NewUser(opts...)
+	return model.NewPOSTUser(opts...)
 }
 
-func teamModelsFromEntities(entities []*ent.User) ([]*model.User, []error) {
-	var results []*model.User
+func teamModelsFromEntities(entities []*ent.User) ([]*model.POSTUserModel, []error) {
+	var results []*model.POSTUserModel
 	var errs []error
 
 	for _, entity := range entities {
-		opts := []model.NewUserOption{
-			model.NewUserID(entity.ID),
-			model.NewUserFirstName(entity.FirstName),
-			model.NewUserLastName(entity.LastName),
-			model.NewUserEmail(entity.Email),
+		opts := []model.NewPOSTUserOption{
+			model.NewPOSTUserID(entity.ID),
+			model.NewPOSTUserFirstName(entity.FirstName),
+			model.NewPOSTUserLastName(entity.LastName),
+			model.NewPOSTUserEmail(entity.Email),
 		}
-		result, err := model.NewUser(opts...)
+		result, err := model.NewPOSTUser(opts...)
 		results = append(results, result)
 		errs = append(errs, err)
 	}

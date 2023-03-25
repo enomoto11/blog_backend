@@ -22,9 +22,9 @@ func Test_UserService_CreateUser(t *testing.T) {
 	tests := []struct {
 		name          string
 		requestBody   request.CreateUserRequestBody
-		InitModel     func(*testing.T, request.CreateUserRequestBody) *model.User
-		prepareMockFn func(*testing.T, *userServiceMocks, *model.User)
-		matcher       func(*testing.T, *model.User, *model.User, error)
+		InitModel     func(*testing.T, request.CreateUserRequestBody) *model.POSTUserModel
+		prepareMockFn func(*testing.T, *userServiceMocks, *model.POSTUserModel)
+		matcher       func(*testing.T, *model.POSTUserModel, *model.POSTUserModel, error)
 	}{
 		{
 			name: "正常系",
@@ -34,31 +34,31 @@ func Test_UserService_CreateUser(t *testing.T) {
 				Email:      "a.hayakawa@koan.me",
 				Password:   "kon_mirai4",
 			},
-			InitModel: func(t *testing.T, rb request.CreateUserRequestBody) *model.User {
-				m, err := model.NewUser(
-					model.NewUserID(id),
-					model.NewUserFirstName(rb.First_name),
-					model.NewUserLastName(rb.Last_name),
-					model.NewUserEmail(rb.Email),
-					model.NewUserPassword(rb.Password),
+			InitModel: func(t *testing.T, rb request.CreateUserRequestBody) *model.POSTUserModel {
+				m, err := model.NewPOSTUser(
+					model.NewPOSTUserID(id),
+					model.NewPOSTUserFirstName(rb.First_name),
+					model.NewPOSTUserLastName(rb.Last_name),
+					model.NewPOSTUserEmail(rb.Email),
+					model.NewPOSTUserPassword(rb.Password),
 				)
 				require.NoError(t, err)
 
 				return m
 			},
-			prepareMockFn: func(t *testing.T, mocks *userServiceMocks, user *model.User) {
+			prepareMockFn: func(t *testing.T, mocks *userServiceMocks, user *model.POSTUserModel) {
 				mocks.createUserRepo.EXPECT().Create(ctx,
 					NewCmpMatcher(
 						user,
-						cmp.AllowUnexported(model.User{}),
-						cmpopts.IgnoreFields(model.User{}, "id"),
+						cmp.AllowUnexported(model.POSTUserModel{}),
+						cmpopts.IgnoreFields(model.POSTUserModel{}, "id"),
 					),
 				).Return(user, nil)
 			},
-			matcher: func(t *testing.T, expected *model.User, got *model.User, err error) {
+			matcher: func(t *testing.T, expected *model.POSTUserModel, got *model.POSTUserModel, err error) {
 				opts := []cmp.Option{
-					cmp.AllowUnexported(model.User{}),
-					cmpopts.IgnoreFields(model.User{}, "id"),
+					cmp.AllowUnexported(model.POSTUserModel{}),
+					cmpopts.IgnoreFields(model.POSTUserModel{}, "id"),
 				}
 				diff := cmp.Diff(expected, got, opts...)
 

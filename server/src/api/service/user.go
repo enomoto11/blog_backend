@@ -10,8 +10,8 @@ import (
 )
 
 type UserService interface {
-	CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, error)
-	FindAllUsers(ctx context.Context) ([]*model.User, error)
+	CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.POSTUserModel, error)
+	FindAllUsers(ctx context.Context) ([]*model.POSTUserModel, error)
 }
 
 type userService struct {
@@ -24,12 +24,12 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 	}
 }
 
-func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.User, error) {
-	user, err := model.NewUser(
-		model.NewUserFirstName(rb.First_name),
-		model.NewUserLastName(rb.Last_name),
-		model.NewUserEmail(rb.Email),
-		model.NewUserPassword(rb.Password),
+func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserRequestBody) (*model.POSTUserModel, error) {
+	user, err := model.NewPOSTUser(
+		model.NewPOSTUserFirstName(rb.First_name),
+		model.NewPOSTUserLastName(rb.Last_name),
+		model.NewPOSTUserEmail(rb.Email),
+		model.NewPOSTUserPassword(rb.Password),
 	)
 	if err != nil {
 		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
@@ -45,7 +45,7 @@ func (s *userService) CreateUser(ctx context.Context, rb request.CreateUserReque
 	return result, nil
 }
 
-func (s *userService) FindAllUsers(ctx context.Context) ([]*model.User, error) {
+func (s *userService) FindAllUsers(ctx context.Context) ([]*model.POSTUserModel, error) {
 	users, errs := s.userRepo.FindAll(ctx)
 	if errs != nil {
 		internalError := error2.NewInternalError(http.StatusInternalServerError, errs[0])

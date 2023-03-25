@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type User struct {
+type POSTUserModel struct {
 	id         uuid.UUID
 	first_name string
 	last_name  string
@@ -14,10 +14,10 @@ type User struct {
 	password   string
 }
 
-type NewUserOption func(u *User)
+type NewPOSTUserOption func(u *POSTUserModel)
 
-func NewUser(opts ...NewUserOption) (*User, error) {
-	user := &User{}
+func NewPOSTUser(opts ...NewPOSTUserOption) (*POSTUserModel, error) {
+	user := &POSTUserModel{}
 
 	// user作成時にデフォルトでuuidを設定。上書き可能。
 	user.id = uuid.Must(uuid.NewRandom())
@@ -32,53 +32,53 @@ func NewUser(opts ...NewUserOption) (*User, error) {
 	return user, nil
 }
 
-func NewUserID(id uuid.UUID) NewUserOption {
-	return func(u *User) {
+func NewPOSTUserID(id uuid.UUID) NewPOSTUserOption {
+	return func(u *POSTUserModel) {
 		u.id = id
 	}
 }
 
-func NewUserFirstName(first_name string) NewUserOption {
-	return func(u *User) {
+func NewPOSTUserFirstName(first_name string) NewPOSTUserOption {
+	return func(u *POSTUserModel) {
 		u.first_name = first_name
 	}
 }
 
-func NewUserLastName(last_name string) NewUserOption {
-	return func(u *User) {
+func NewPOSTUserLastName(last_name string) NewPOSTUserOption {
+	return func(u *POSTUserModel) {
 		u.last_name = last_name
 	}
 }
 
-func NewUserEmail(email string) NewUserOption {
-	return func(u *User) {
+func NewPOSTUserEmail(email string) NewPOSTUserOption {
+	return func(u *POSTUserModel) {
 		u.email = email
 	}
 }
 
-func NewUserPassword(password string) NewUserOption {
-	return func(u *User) {
+func NewPOSTUserPassword(password string) NewPOSTUserOption {
+	return func(u *POSTUserModel) {
 		u.password = password
 	}
 }
 
-func (user *User) GetID() uuid.UUID {
+func (user *POSTUserModel) GetID() uuid.UUID {
 	return user.id
 }
-func (user *User) GetFirstName() string {
+func (user *POSTUserModel) GetFirstName() string {
 	return user.first_name
 }
-func (user *User) GetLastName() string {
+func (user *POSTUserModel) GetLastName() string {
 	return user.last_name
 }
-func (user *User) GetEmail() string {
+func (user *POSTUserModel) GetEmail() string {
 	return user.email
 }
-func (user *User) GetPassword() string {
+func (user *POSTUserModel) GetPassword() string {
 	return user.password
 }
 
-func (u *User) validate() *ValidationErrors {
+func (u *POSTUserModel) validate() *ValidationErrors {
 	var errors []*ValidationError
 
 	if ve := u.isIDValid(); ve != nil {
@@ -101,25 +101,25 @@ func (u *User) validate() *ValidationErrors {
 
 }
 
-func (u *User) isIDValid() *ValidationError {
+func (u *POSTUserModel) isIDValid() *ValidationError {
 	if u.id == uuid.Nil {
 		return NewValidationError("empty UUID in user ID is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserFirstNameValid() *ValidationError {
+func (u *POSTUserModel) isUserFirstNameValid() *ValidationError {
 	if u.first_name == "" {
 		return NewValidationError("empty string in first name is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserLastNameValid() *ValidationError {
+func (u *POSTUserModel) isUserLastNameValid() *ValidationError {
 	if u.last_name == "" {
 		return NewValidationError("empty string in last name is not allowed")
 	}
 	return nil
 }
-func (u *User) isUserEmailValid() *ValidationError {
+func (u *POSTUserModel) isUserEmailValid() *ValidationError {
 	if u.email == "" {
 		return NewValidationError("empty string in email is not allowed")
 	}
@@ -129,7 +129,7 @@ func (u *User) isUserEmailValid() *ValidationError {
 	}
 	return nil
 }
-func (u *User) isUserPasswordValid() *ValidationError {
+func (u *POSTUserModel) isUserPasswordValid() *ValidationError {
 	if u.password == "" {
 		return NewValidationError("empty string in password is not allowed")
 	}
