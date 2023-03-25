@@ -84,7 +84,7 @@ func (pc *PostCreate) SetUserID(u uuid.UUID) *PostCreate {
 }
 
 // SetCategoryID sets the "category_id" field.
-func (pc *PostCreate) SetCategoryID(i int) *PostCreate {
+func (pc *PostCreate) SetCategoryID(i int64) *PostCreate {
 	pc.mutation.SetCategoryID(i)
 	return pc
 }
@@ -268,7 +268,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

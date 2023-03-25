@@ -76,7 +76,7 @@ func (pu *PostUpdate) SetUserID(u uuid.UUID) *PostUpdate {
 }
 
 // SetCategoryID sets the "category_id" field.
-func (pu *PostUpdate) SetCategoryID(i int) *PostUpdate {
+func (pu *PostUpdate) SetCategoryID(i int64) *PostUpdate {
 	pu.mutation.SetCategoryID(i)
 	return pu
 }
@@ -219,7 +219,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -232,7 +232,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
@@ -305,7 +305,7 @@ func (puo *PostUpdateOne) SetUserID(u uuid.UUID) *PostUpdateOne {
 }
 
 // SetCategoryID sets the "category_id" field.
-func (puo *PostUpdateOne) SetCategoryID(i int) *PostUpdateOne {
+func (puo *PostUpdateOne) SetCategoryID(i int64) *PostUpdateOne {
 	puo.mutation.SetCategoryID(i)
 	return puo
 }
@@ -478,7 +478,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -491,7 +491,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Columns: []string{post.CategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {
