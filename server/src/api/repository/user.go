@@ -8,6 +8,7 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, m *model.User) (*model.User, error)
+	FindAll(ctx context.Context) ([]*model.User, []error)
 }
 
 type userRepository struct {
@@ -34,6 +35,18 @@ func (r *userRepository) Create(ctx context.Context, m *model.User) (*model.User
 	return teamModelFromEntity(entity)
 }
 
+func (r *userRepository) FindAll(ctx context.Context) ([]*model.User, []error) {
+	entities, err := r.client.User.Query().All(ctx)
+
+	if err != nil {
+		var errs []error
+		errs = append(errs, err)
+		return nil, errs
+	}
+
+	return teamModelsFromEntities(entities)
+}
+
 func teamModelFromEntity(entity *ent.User) (*model.User, error) {
 	opts := []model.NewUserOption{
 		model.NewUserID(entity.ID),
@@ -44,4 +57,23 @@ func teamModelFromEntity(entity *ent.User) (*model.User, error) {
 	}
 
 	return model.NewUser(opts...)
+}
+
+func teamModelsFromEntities(entities []*ent.User) ([]*model.User, []error) {
+	var results []*model.User
+	var errs []error
+
+	for _, entity := range entities {
+		opts := []model.NewUserOption{
+			model.NewUserID(entity.ID),
+			model.NewUserFirstName(entity.FirstName),
+			model.NewUserLastName(entity.LastName),
+			model.NewUserEmail(entity.Email),
+		}
+		result, err := model.NewUser(opts...)
+		results = append(results, result)
+		errs = append(errs, err)
+	}
+
+	return results, errs
 }
