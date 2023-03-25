@@ -16,18 +16,18 @@ type UserController interface {
 }
 
 type userController struct {
-	teamService service.UserService
+	userService service.UserService
 }
 
-func NewUserController(teamService service.UserService) UserController {
+func NewUserController(userService service.UserService) UserController {
 	return &userController{
-		teamService,
+		userService,
 	}
 }
 
 func (c *userController) FindAllUserController(r *gin.Engine) {
 	r.GET("users", func(ctx *gin.Context) {
-		result, err := c.teamService.FindAllUsers(ctx)
+		result, err := c.userService.FindAllUsers(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -69,7 +69,7 @@ func (c *userController) CreateUserController(r *gin.Engine) {
 			return
 		}
 
-		result, err := c.teamService.CreateUser(ctx, requestBody)
+		result, err := c.userService.CreateUser(ctx, requestBody)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

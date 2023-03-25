@@ -32,7 +32,7 @@ func (r *userRepository) Create(ctx context.Context, m *model.POSTUserModel) (*m
 		return nil, err
 	}
 
-	return teamModelFromEntity(entity)
+	return userModelFromEntity(entity)
 }
 
 func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, []error) {
@@ -44,10 +44,10 @@ func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, []
 		return nil, errs
 	}
 
-	return teamModelsFromEntities(entities)
+	return userModelsFromEntities(entities)
 }
 
-func teamModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
+func userModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
 	opts := []model.NewPOSTUserOption{
 		model.NewPOSTUserID(entity.ID),
 		model.NewPOSTUserFirstName(entity.FirstName),
@@ -59,7 +59,7 @@ func teamModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
 	return model.NewPOSTUser(opts...)
 }
 
-func teamModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, []error) {
+func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, []error) {
 	var results []*model.GETUserModel
 	var errs []error
 
