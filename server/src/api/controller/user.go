@@ -2,7 +2,7 @@ package controller
 
 import (
 	"blog/api/controller/request"
-	"blog/api/controller/response"
+	"blog/api/model"
 	"blog/api/service"
 	"net/http"
 
@@ -29,19 +29,35 @@ func (c *userController) FindAllUserController(r *gin.Engine) {
 	r.GET("users", func(ctx *gin.Context) {
 		result, err := c.teamService.FindAllUsers(ctx)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		response := make([]response.AllUserResponse, 0, len(result))
+		response := convertGETUserModelsToAllUserResponse(result)
 
 		ctx.JSON(http.StatusOK, response)
 	})
 }
 
+func convertGETUserModelsToAllUserResponse(models []*model.GETUserModel) GETAllUserResponse {
+	var response GETAllUserResponse
+	for _, model := range models {
+		user := getEachUser{
+			ID:        model.GetID(),
+			FirstName: model.GetFirstName(),
+			LastName:  model.GetLastName(),
+			Email:     model.GetEmail(),
+		}
+
+		response = append(response, user)
+	}
+
+	return response
+}
+
 func (c *userController) CreateUserController(r *gin.Engine) {
 	r.POST("user/new", func(ctx *gin.Context) {
-		var requestBody request.CreateUserRequestBody
+		var requestBody request.POSTUserRequestBody
 		if err := ctx.ShouldBindJSON(&requestBody); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

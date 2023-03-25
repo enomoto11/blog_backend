@@ -21,24 +21,24 @@ func Test_UserService_CreateUser(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		requestBody   request.CreateUserRequestBody
-		InitModel     func(*testing.T, request.CreateUserRequestBody) *model.POSTUserModel
+		requestBody   request.POSTUserRequestBody
+		InitModel     func(*testing.T, request.POSTUserRequestBody) *model.POSTUserModel
 		prepareMockFn func(*testing.T, *userServiceMocks, *model.POSTUserModel)
 		matcher       func(*testing.T, *model.POSTUserModel, *model.POSTUserModel, error)
 	}{
 		{
 			name: "正常系",
-			requestBody: request.CreateUserRequestBody{
-				First_name: "アキ",
-				Last_name:  "早川",
-				Email:      "a.hayakawa@koan.me",
-				Password:   "kon_mirai4",
+			requestBody: request.POSTUserRequestBody{
+				FirstName: "アキ",
+				LastName:  "早川",
+				Email:     "a.hayakawa@koan.me",
+				Password:  "kon_mirai4",
 			},
-			InitModel: func(t *testing.T, rb request.CreateUserRequestBody) *model.POSTUserModel {
+			InitModel: func(t *testing.T, rb request.POSTUserRequestBody) *model.POSTUserModel {
 				m, err := model.NewPOSTUser(
 					model.NewPOSTUserID(id),
-					model.NewPOSTUserFirstName(rb.First_name),
-					model.NewPOSTUserLastName(rb.Last_name),
+					model.NewPOSTUserFirstName(rb.FirstName),
+					model.NewPOSTUserLastName(rb.LastName),
 					model.NewPOSTUserEmail(rb.Email),
 					model.NewPOSTUserPassword(rb.Password),
 				)
