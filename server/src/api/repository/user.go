@@ -3,12 +3,16 @@ package repository
 import (
 	"blog/api/model"
 	"blog/ent"
+	"blog/ent/user"
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type UserRepository interface {
 	Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error)
 	FindAll(ctx context.Context) ([]*model.GETUserModel, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*model.GETUserModel, error)
 }
 
 type userRepository struct {
@@ -32,7 +36,17 @@ func (r *userRepository) Create(ctx context.Context, m *model.POSTUserModel) (*m
 		return nil, err
 	}
 
-	return userModelFromEntity(entity)
+	return postUserModelFromEntity(entity)
+}
+
+func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.GETUserModel, error) {
+	entity, err := r.client.User.Query().Where(user.ID(id)).Only(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return getUserModelFromEntity(entity)
 }
 
 func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, error) {
@@ -45,7 +59,7 @@ func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, er
 	return userModelsFromEntities(entities)
 }
 
-func userModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
+func postUserModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
 	opts := []model.NewPOSTUserOption{
 		model.NewPOSTUserID(entity.ID),
 		model.NewPOSTUserFirstName(entity.FirstName),
@@ -55,6 +69,17 @@ func userModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
 	}
 
 	return model.NewPOSTUser(opts...)
+}
+
+func getUserModelFromEntity(entity *ent.User) (*model.GETUserModel, error) {
+	opts := []model.NewGETUserOption{
+		model.NewGETUserID(entity.ID),
+		model.NewGETUserFirstName(entity.FirstName),
+		model.NewGETUserLastName(entity.LastName),
+		model.NewGETUserEmail(entity.Email),
+	}
+
+	return model.NewGETUser(opts...)
 }
 
 func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, error) {
