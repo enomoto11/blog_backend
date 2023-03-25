@@ -15,15 +15,26 @@ type PostService interface {
 
 type postService struct {
 	postRepo repository.PostRepository
+	userRepo repository.UserRepository
 }
 
-func NewPostService(postRepo repository.PostRepository) PostService {
+func NewPostService(
+	postRepo repository.PostRepository,
+	userRepo repository.UserRepository,
+) PostService {
 	return &postService{
 		postRepo,
+		userRepo,
 	}
 }
 
 func (s *postService) CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.POSTPostModel, error) {
+	user, err := s.userRepo.FindByID(ctx, rb.UserID)
+	if user == nil || err != nil {
+		internalError := error2.NewInternalError(http.StatusBadRequest, err)
+		return nil, internalError
+	}
+
 	post, err := model.NewPOSTPost(
 		model.NewPOSTPostTitle(rb.Title),
 		model.NewPOSTPostBody(rb.Body),
