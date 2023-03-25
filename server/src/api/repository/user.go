@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, m *model.POSTUserModel) (*model.POSTUserModel, error)
-	FindAll(ctx context.Context) ([]*model.GETUserModel, []error)
+	FindAll(ctx context.Context) ([]*model.GETUserModel, error)
 }
 
 type userRepository struct {
@@ -35,13 +35,11 @@ func (r *userRepository) Create(ctx context.Context, m *model.POSTUserModel) (*m
 	return userModelFromEntity(entity)
 }
 
-func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, []error) {
+func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, error) {
 	entities, err := r.client.User.Query().All(ctx)
 
 	if err != nil {
-		var errs []error
-		errs = append(errs, err)
-		return nil, errs
+		return nil, err
 	}
 
 	return userModelsFromEntities(entities)
@@ -59,7 +57,7 @@ func userModelFromEntity(entity *ent.User) (*model.POSTUserModel, error) {
 	return model.NewPOSTUser(opts...)
 }
 
-func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, []error) {
+func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, error) {
 	var results []*model.GETUserModel
 	var errs []error
 
@@ -75,5 +73,5 @@ func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, []erro
 		errs = append(errs, err)
 	}
 
-	return results, errs
+	return results, errs[0]
 }

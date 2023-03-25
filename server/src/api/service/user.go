@@ -46,10 +46,10 @@ func (s *userService) CreateUser(ctx context.Context, rb request.POSTUserRequest
 }
 
 func (s *userService) FindAllUsers(ctx context.Context) ([]*model.GETUserModel, error) {
-	users, errs := s.userRepo.FindAll(ctx)
+	users, err := s.userRepo.FindAll(ctx)
 
-	if errs[0] != nil {
-		internalError := error2.NewInternalError(http.StatusInternalServerError, errs[0])
+	if err != nil {
+		internalError := error2.NewInternalError(http.StatusInternalServerError, err)
 		return nil, internalError
 	}
 
