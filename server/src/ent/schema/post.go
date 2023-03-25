@@ -20,7 +20,7 @@ func (Post) Fields() []ent.Field {
 		field.String("title"),
 		field.String("body"),
 		field.UUID("user_id", uuid.UUID{}),
-		field.Int("category_id"),
+		field.Int64("category_id"),
 	}
 }
 

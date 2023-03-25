@@ -32,7 +32,7 @@ type Post struct {
 	// UserID holds the value of the "user_id" field.
 	UserID uuid.UUID `json:"user_id,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
-	CategoryID int `json:"category_id,omitempty"`
+	CategoryID int64 `json:"category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges PostEdges `json:"edges"`
@@ -149,7 +149,7 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
 			} else if value.Valid {
-				po.CategoryID = int(value.Int64)
+				po.CategoryID = value.Int64
 			}
 		}
 	}

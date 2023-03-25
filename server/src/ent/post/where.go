@@ -87,7 +87,7 @@ func UserID(v uuid.UUID) predicate.Post {
 }
 
 // CategoryID applies equality check predicate on the "category_id" field. It's identical to CategoryIDEQ.
-func CategoryID(v int) predicate.Post {
+func CategoryID(v int64) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCategoryID, v))
 }
 
@@ -372,22 +372,22 @@ func UserIDNotIn(vs ...uuid.UUID) predicate.Post {
 }
 
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.
-func CategoryIDEQ(v int) predicate.Post {
+func CategoryIDEQ(v int64) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCategoryID, v))
 }
 
 // CategoryIDNEQ applies the NEQ predicate on the "category_id" field.
-func CategoryIDNEQ(v int) predicate.Post {
+func CategoryIDNEQ(v int64) predicate.Post {
 	return predicate.Post(sql.FieldNEQ(FieldCategoryID, v))
 }
 
 // CategoryIDIn applies the In predicate on the "category_id" field.
-func CategoryIDIn(vs ...int) predicate.Post {
+func CategoryIDIn(vs ...int64) predicate.Post {
 	return predicate.Post(sql.FieldIn(FieldCategoryID, vs...))
 }
 
 // CategoryIDNotIn applies the NotIn predicate on the "category_id" field.
-func CategoryIDNotIn(vs ...int) predicate.Post {
+func CategoryIDNotIn(vs ...int64) predicate.Post {
 	return predicate.Post(sql.FieldNotIn(FieldCategoryID, vs...))
 }
 

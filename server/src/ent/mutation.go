@@ -37,7 +37,7 @@ type CategoryMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *int64
 	created_at    *time.Time
 	updated_at    *time.Time
 	deleted_at    *time.Time
@@ -71,7 +71,7 @@ func newCategoryMutation(c config, op Op, opts ...categoryOption) *CategoryMutat
 }
 
 // withCategoryID sets the ID field of the mutation.
-func withCategoryID(id int) categoryOption {
+func withCategoryID(id int64) categoryOption {
 	return func(m *CategoryMutation) {
 		var (
 			err   error
@@ -123,13 +123,13 @@ func (m CategoryMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Category entities.
-func (m *CategoryMutation) SetID(id int) {
+func (m *CategoryMutation) SetID(id int64) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CategoryMutation) ID() (id int, exists bool) {
+func (m *CategoryMutation) ID() (id int64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -140,12 +140,12 @@ func (m *CategoryMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CategoryMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *CategoryMutation) IDs(ctx context.Context) ([]int64, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []int64{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -655,7 +655,7 @@ type PostMutation struct {
 	clearedFields   map[string]struct{}
 	user            *uuid.UUID
 	cleareduser     bool
-	category        *int
+	category        *int64
 	clearedcategory bool
 	done            bool
 	oldValue        func(context.Context) (*Post, error)
@@ -996,12 +996,12 @@ func (m *PostMutation) ResetUserID() {
 }
 
 // SetCategoryID sets the "category_id" field.
-func (m *PostMutation) SetCategoryID(i int) {
+func (m *PostMutation) SetCategoryID(i int64) {
 	m.category = &i
 }
 
 // CategoryID returns the value of the "category_id" field in the mutation.
-func (m *PostMutation) CategoryID() (r int, exists bool) {
+func (m *PostMutation) CategoryID() (r int64, exists bool) {
 	v := m.category
 	if v == nil {
 		return
@@ -1012,7 +1012,7 @@ func (m *PostMutation) CategoryID() (r int, exists bool) {
 // OldCategoryID returns the old "category_id" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldCategoryID(ctx context.Context) (v int, err error) {
+func (m *PostMutation) OldCategoryID(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCategoryID is only allowed on UpdateOne operations")
 	}
@@ -1070,7 +1070,7 @@ func (m *PostMutation) CategoryCleared() bool {
 // CategoryIDs returns the "category" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CategoryID instead. It exists only for internal usage by the builders.
-func (m *PostMutation) CategoryIDs() (ids []int) {
+func (m *PostMutation) CategoryIDs() (ids []int64) {
 	if id := m.category; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1236,7 +1236,7 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		m.SetUserID(v)
 		return nil
 	case post.FieldCategoryID:
-		v, ok := value.(int)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

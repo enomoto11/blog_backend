@@ -474,8 +474,8 @@ func (pq *PostQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Po
 	return nil
 }
 func (pq *PostQuery) loadCategory(ctx context.Context, query *CategoryQuery, nodes []*Post, init func(*Post), assign func(*Post, *Category)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Post)
+	ids := make([]int64, 0, len(nodes))
+	nodeids := make(map[int64][]*Post)
 	for i := range nodes {
 		fk := nodes[i].CategoryID
 		if _, ok := nodeids[fk]; !ok {

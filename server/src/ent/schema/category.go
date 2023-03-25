@@ -16,7 +16,7 @@ type Category struct {
 // Fields of the Category.
 func (Category) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").Positive(),
+		field.Int64("id").Positive(),
 		field.String("name"),
 	}
 }
