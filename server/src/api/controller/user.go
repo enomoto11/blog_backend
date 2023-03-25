@@ -2,6 +2,7 @@ package controller
 
 import (
 	"blog/api/controller/request"
+	"blog/api/controller/response"
 	"blog/api/service"
 	"net/http"
 
@@ -11,16 +12,31 @@ import (
 
 type UserController interface {
 	CreateUserController(r *gin.Engine)
+	FindAllUserController(r *gin.Engine)
 }
 
 type userController struct {
-	createTeamService service.UserService
+	teamService service.UserService
 }
 
-func NewUserController(createTeamService service.UserService) UserController {
+func NewUserController(teamService service.UserService) UserController {
 	return &userController{
-		createTeamService,
+		teamService,
 	}
+}
+
+func (c *userController) FindAllUserController(r *gin.Engine) {
+	r.GET("users", func(ctx *gin.Context) {
+		result, err := c.teamService.FindAllUser(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		response := make([]response.AllUserResponse, 0, len(result))
+
+		ctx.JSON(http.StatusOK, response)
+	})
 }
 
 func (c *userController) CreateUserController(r *gin.Engine) {
@@ -37,7 +53,7 @@ func (c *userController) CreateUserController(r *gin.Engine) {
 			return
 		}
 
-		result, err := c.createTeamService.CreateUser(ctx, requestBody)
+		result, err := c.teamService.CreateUser(ctx, requestBody)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
