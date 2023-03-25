@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	postCategoryNameMaxLength = 20
+	postCategoryNameMaxLength = 50
 )
 
 type POSTCategoryModel struct {
