@@ -17,7 +17,7 @@ type Category struct {
 func (Category) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Positive(),
-		field.String("name"),
+		field.String("name").MaxLen(50),
 	}
 }
 

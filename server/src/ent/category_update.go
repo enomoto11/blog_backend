@@ -139,7 +139,20 @@ func (cu *CategoryUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *CategoryUpdate) check() error {
+	if v, ok := cu.mutation.Name(); ok {
+		if err := category.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Category.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -347,7 +360,20 @@ func (cuo *CategoryUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *CategoryUpdateOne) check() error {
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := category.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Category.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err error) {
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt64))
 	id, ok := cuo.mutation.ID()
 	if !ok {

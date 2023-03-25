@@ -147,6 +147,11 @@ func (cc *CategoryCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Category.name"`)}
 	}
+	if v, ok := cc.mutation.Name(); ok {
+		if err := category.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Category.name": %w`, err)}
+		}
+	}
 	if v, ok := cc.mutation.ID(); ok {
 		if err := category.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Category.id": %w`, err)}
