@@ -73,5 +73,9 @@ func userModelsFromEntities(entities []*ent.User) ([]*model.GETUserModel, error)
 		errs = append(errs, err)
 	}
 
-	return results, errs[0]
+	if len(errs) != 0 {
+		return nil, errs[0]
+	}
+
+	return results, nil
 }
