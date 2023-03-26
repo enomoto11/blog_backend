@@ -66,6 +66,73 @@ func Test_UserRepository_Create(t *testing.T) {
 	}
 }
 
+func Test_UserRepository_FindByID(t *testing.T) {
+	type args struct {
+		id  uuid.UUID
+		ctx context.Context
+	}
+
+	ctx := context.Background()
+	id := uuid.New()
+
+	user1, err1 := model.NewGETUser(
+		model.NewGETUserID(id),
+		model.NewGETUserFirstName("悟"),
+		model.NewGETUserLastName("五条"),
+		model.NewGETUserEmail("s.gojo@kosen.com"),
+	)
+	require.NoError(t, err1)
+
+	tests := []struct {
+		name      string
+		args      args
+		prepareFn func(t *testing.T, user1 *model.GETUserModel, client *ent.Client)
+		matcher   func(t *testing.T, expected *model.GETUserModel, got *model.GETUserModel, err error)
+	}{
+		{
+			name: "正常系：五条悟をユーザーIDで取得する",
+			args: args{
+				id:  id,
+				ctx: ctx,
+			},
+			prepareFn: func(t *testing.T, user1 *model.GETUserModel, client *ent.Client) {
+				_, err := client.User.Create().
+					SetID(user1.GetID()).
+					SetFirstName(user1.GetFirstName()).
+					SetLastName(user1.GetLastName()).
+					SetEmail(user1.GetEmail()).
+					SetPassword("jujutsukaisenn").
+					Save(ctx)
+				require.NoError(t, err)
+			},
+			matcher: func(t *testing.T, expected *model.GETUserModel, got *model.GETUserModel, err error) {
+				assert.NoError(t, err)
+				assert.NotEmpty(t, got)
+				assert.Equal(t, expected, got)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arange
+			client, err := InitializeEntClient(t)
+			defer func(client *ent.Client) {
+				_ = client.Close()
+			}(client)
+			require.NoError(t, err)
+			repo := &userRepository{client}
+			tt.prepareFn(t, user1, client)
+
+			// Action
+			got, err := repo.FindByID(tt.args.ctx, tt.args.id)
+
+			// Assert
+			tt.matcher(t, user1, got, err)
+		})
+	}
+}
+
 func Test_UserRepository_FindAll(t *testing.T) {
 	ctx := context.Background()
 
