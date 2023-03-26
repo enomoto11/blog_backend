@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestXxx(t *testing.T) {
+func Test_PosrRepository_Create(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		m   *model.POSTPostModel
