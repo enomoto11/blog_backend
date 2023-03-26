@@ -20,6 +20,7 @@ func NewPostRepository(client *ent.Client) PostRepository {
 
 func (r *postRepository) Create(ctx context.Context, m *model.POSTPostModel) (*model.POSTPostModel, error) {
 	entity, err := r.client.Post.Create().
+		SetID(m.GetID()).
 		SetTitle(m.GetTitle()).
 		SetBody(m.GetBody()).
 		SetCategoryID(m.GetCategoryID()).
