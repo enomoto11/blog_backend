@@ -11,6 +11,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -61,9 +62,9 @@ func Test_CategoryService_CreateCategory(t *testing.T) {
 				}
 				diff := cmp.Diff(expected, got, opts...)
 
-				require.NoError(t, err)
-				require.NotEmpty(t, got)
-				require.Equal(t, diff, "")
+				assert.NoError(t, err)
+				assert.NotEmpty(t, got)
+				assert.Equal(t, diff, "")
 			},
 		},
 	}
@@ -81,7 +82,6 @@ func Test_CategoryService_CreateCategory(t *testing.T) {
 
 			// Assert
 			tt.matcher(t, tt.want, got, err)
-
 		})
 	}
 

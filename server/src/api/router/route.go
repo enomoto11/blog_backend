@@ -38,6 +38,7 @@ func InitControllers() (*gin.Engine, *ent.Client) {
 	controllers.userController.CreateUserController(router)
 	controllers.userController.FindAllUserController(router)
 	controllers.categoryController.CreateCategoryController(router)
+	controllers.postController.CreatePostController(router)
 
 	return router, entClient
 }
@@ -45,20 +46,29 @@ func InitControllers() (*gin.Engine, *ent.Client) {
 type initializedContrllers struct {
 	userController     controller.UserController
 	categoryController controller.CategoryController
+	postController     controller.PostController
 }
 
 func setUpController(entClient *ent.Client) initializedContrllers {
 	userRepo := repository.NewUserRepository(entClient)
 	categoryRepo := repository.NewCategoryRepository(entClient)
+	postRepo := repository.NewPostRepository(entClient)
 
 	userService := service.NewUserService(userRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
+	postService := service.NewPostService(
+		postRepo,
+		userRepo,
+		categoryRepo,
+	)
 
 	userController := controller.NewUserController(userService)
 	categoryController := controller.NewCategoryController(categoryService)
+	postController := controller.NewPostController(postService)
 
 	return initializedContrllers{
 		userController,
 		categoryController,
+		postController,
 	}
 }
