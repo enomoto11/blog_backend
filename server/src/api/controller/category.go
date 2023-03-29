@@ -10,7 +10,7 @@ import (
 )
 
 type CategoryController interface {
-	CreateCategoryController(r *gin.Engine)
+	RegisterHandlers(r gin.IRouter)
 }
 
 type categoryController struct {
@@ -23,7 +23,7 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 	}
 }
 
-func (c *categoryController) CreateCategoryController(r *gin.Engine) {
+func (c *categoryController) RegisterHandlers(r gin.IRouter) {
 	r.POST("category/new", func(ctx *gin.Context) {
 		var requestBody request.POSTCategoryRequestBody
 		if err := ctx.ShouldBindJSON(&requestBody); err != nil {

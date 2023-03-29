@@ -33,23 +33,19 @@ func InitControllers() (*gin.Engine, *ent.Client) {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	controllers := setUpController(entClient)
-
-	controllers.userController.CreateUserController(router)
-	controllers.userController.FindAllUserController(router)
-	controllers.categoryController.CreateCategoryController(router)
-	controllers.postController.CreatePostController(router)
+	controllers := setUpControllers(entClient)
+	for _, controller := range controllers {
+		controller.RegisterHandlers(router)
+	}
 
 	return router, entClient
 }
 
-type initializedContrllers struct {
-	userController     controller.UserController
-	categoryController controller.CategoryController
-	postController     controller.PostController
+type Controller interface {
+	RegisterHandlers(r gin.IRouter)
 }
 
-func setUpController(entClient *ent.Client) initializedContrllers {
+func setUpControllers(entClient *ent.Client) []Controller {
 	userRepo := repository.NewUserRepository(entClient)
 	categoryRepo := repository.NewCategoryRepository(entClient)
 	postRepo := repository.NewPostRepository(entClient)
@@ -66,7 +62,7 @@ func setUpController(entClient *ent.Client) initializedContrllers {
 	categoryController := controller.NewCategoryController(categoryService)
 	postController := controller.NewPostController(postService)
 
-	return initializedContrllers{
+	return []Controller{
 		userController,
 		categoryController,
 		postController,

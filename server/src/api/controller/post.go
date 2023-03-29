@@ -10,7 +10,7 @@ import (
 )
 
 type PostController interface {
-	CreatePostController(r *gin.Engine)
+	RegisterHandlers(r gin.IRouter)
 }
 
 type postController struct {
@@ -23,7 +23,7 @@ func NewPostController(postService service.PostService) PostController {
 	}
 }
 
-func (c *postController) CreatePostController(r *gin.Engine) {
+func (c *postController) RegisterHandlers(r gin.IRouter) {
 	r.POST("post/new", func(ctx *gin.Context) {
 		var requestBody request.POSTPostRequestBody
 		if err := ctx.ShouldBindJSON(&requestBody); err != nil {
