@@ -23,10 +23,14 @@ type createdCategoryResponse struct {
 	Name string
 }
 
-type createdPostResponse struct {
+type post struct {
 	ID         uuid.UUID
 	CategoryID int64
 	UserID     uuid.UUID
 	Title      string
 	Body       string
 }
+
+type createdPostResponse post
+
+type allpostsResponse []post
