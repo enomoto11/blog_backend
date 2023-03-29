@@ -7,7 +7,8 @@ import (
 )
 
 type PostRepository interface {
-	Create(ctx context.Context, m *model.POSTPostModel) (*model.POSTPostModel, error)
+	Create(ctx context.Context, m *model.PostModel) (*model.PostModel, error)
+	FindAll(ctx context.Context) ([]*model.PostModel, error)
 }
 
 type postRepository struct {
@@ -18,7 +19,7 @@ func NewPostRepository(client *ent.Client) PostRepository {
 	return &postRepository{client}
 }
 
-func (r *postRepository) Create(ctx context.Context, m *model.POSTPostModel) (*model.POSTPostModel, error) {
+func (r *postRepository) Create(ctx context.Context, m *model.PostModel) (*model.PostModel, error) {
 	entity, err := r.client.Post.Create().
 		SetID(m.GetID()).
 		SetTitle(m.GetTitle()).
@@ -34,14 +35,32 @@ func (r *postRepository) Create(ctx context.Context, m *model.POSTPostModel) (*m
 	return postModelFromEntity(entity)
 }
 
-func postModelFromEntity(entity *ent.Post) (*model.POSTPostModel, error) {
-	opts := []model.NewPOSTPostOption{
-		model.NewPOSTPostID(entity.ID),
-		model.NewPOSTPostTitle(entity.Title),
-		model.NewPOSTPostBody(entity.Body),
-		model.NewPOSTPostCategoryID(entity.CategoryID),
-		model.NewPOSTPostUserID(entity.UserID),
+func postModelFromEntity(entity *ent.Post) (*model.PostModel, error) {
+	opts := []model.NewPostOption{
+		model.NewPostID(entity.ID),
+		model.NewPostTitle(entity.Title),
+		model.NewPostBody(entity.Body),
+		model.NewPostCategoryID(entity.CategoryID),
+		model.NewPostUserID(entity.UserID),
 	}
 
-	return model.NewPOSTPost(opts...)
+	return model.NewPost(opts...)
+}
+
+func (r *postRepository) FindAll(ctx context.Context) ([]*model.PostModel, error) {
+	entities, err := r.client.Post.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*model.PostModel
+	for _, entity := range entities {
+		post, err := postModelFromEntity(entity)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 }

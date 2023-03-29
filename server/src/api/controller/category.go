@@ -24,7 +24,7 @@ func NewCategoryController(categoryService service.CategoryService) CategoryCont
 }
 
 func (c *categoryController) RegisterHandlers(r gin.IRouter) {
-	r.POST("category/new", c.createCategory)
+	r.POST("/category/new", c.createCategory)
 }
 
 func (c *categoryController) createCategory(ctx *gin.Context) {

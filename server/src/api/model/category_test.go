@@ -9,7 +9,7 @@ import (
 
 func Test_CategoryModel_NewCategory(t *testing.T) {
 	type args struct {
-		options []NewPOSTCategoryOption
+		options []NewCategoryOption
 	}
 
 	id := rand.Int63n(1000) * 1
@@ -17,18 +17,18 @@ func Test_CategoryModel_NewCategory(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *POSTCategoryModel
+		want    *CategoryModel
 		wantErr string
 	}{
 		{
 			name: "正常系",
 			args: args{
-				[]NewPOSTCategoryOption{
-					NewPOSTCategoryID(id),
-					NewPOSTCategoryName("テストカテゴリー"),
+				[]NewCategoryOption{
+					NewCategoryID(id),
+					NewCategoryName("テストカテゴリー"),
 				},
 			},
-			want: &POSTCategoryModel{
+			want: &CategoryModel{
 				id:   id,
 				name: "テストカテゴリー",
 			},
@@ -36,9 +36,9 @@ func Test_CategoryModel_NewCategory(t *testing.T) {
 		{
 			name: "異常系: nameが空文字の時エラーが返る",
 			args: args{
-				[]NewPOSTCategoryOption{
-					NewPOSTCategoryID(id),
-					NewPOSTCategoryName(""),
+				[]NewCategoryOption{
+					NewCategoryID(id),
+					NewCategoryName(""),
 				},
 			},
 			wantErr: "empty string in category name is not allowed",
@@ -47,8 +47,8 @@ func Test_CategoryModel_NewCategory(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got1, err1 := NewPOSTCategoryBeforeCreated(tt.args.options...)
-			got2, err2 := NewPOSTCategoryAfterCreated(tt.args.options...)
+			got1, err1 := NewCategoryBeforeCreated(tt.args.options...)
+			got2, err2 := NewCategoryAfterCreated(tt.args.options...)
 			if tt.wantErr != "" {
 				assert.EqualError(t, err1, tt.wantErr)
 			} else {

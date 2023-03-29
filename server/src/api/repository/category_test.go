@@ -15,14 +15,14 @@ import (
 
 func Test_CategoryRepository_Create(t *testing.T) {
 	type args struct {
-		m   *model.POSTCategoryModel
+		m   *model.CategoryModel
 		ctx context.Context
 	}
 
 	ctx := context.Background()
 
-	m1, err1 := model.NewPOSTCategoryBeforeCreated(
-		model.NewPOSTCategoryName("テストカテゴリー"),
+	m1, err1 := model.NewCategoryBeforeCreated(
+		model.NewCategoryName("テストカテゴリー"),
 	)
 
 	require.NoError(t, err1)
@@ -30,7 +30,7 @@ func Test_CategoryRepository_Create(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		matcher func(t *testing.T, expected *model.POSTCategoryModel, got *model.POSTCategoryModel, err error)
+		matcher func(t *testing.T, expected *model.CategoryModel, got *model.CategoryModel, err error)
 	}{
 		{
 			name: "正常系：テストカテゴリーを登録する",
@@ -38,11 +38,11 @@ func Test_CategoryRepository_Create(t *testing.T) {
 				m:   m1,
 				ctx: ctx,
 			},
-			matcher: func(t *testing.T, expected *model.POSTCategoryModel, got *model.POSTCategoryModel, err error) {
+			matcher: func(t *testing.T, expected *model.CategoryModel, got *model.CategoryModel, err error) {
 				// idは自動採番なので、比較対象から除外する
 				opts := []cmp.Option{
-					cmp.AllowUnexported(model.POSTCategoryModel{}),
-					cmpopts.IgnoreFields(model.POSTCategoryModel{}, "id"),
+					cmp.AllowUnexported(model.CategoryModel{}),
+					cmpopts.IgnoreFields(model.CategoryModel{}, "id"),
 				}
 				diff := cmp.Diff(expected, got, opts...)
 
@@ -81,16 +81,16 @@ func Test_CategoryRepository_FindByID(t *testing.T) {
 	ctx := context.Background()
 	id := rand.Int63n(1000) + 1
 
-	m1, err1 := model.NewPOSTCategoryAfterCreated(
-		model.NewPOSTCategoryID(id),
-		model.NewPOSTCategoryName("テストカテゴリー"),
+	m1, err1 := model.NewCategoryAfterCreated(
+		model.NewCategoryID(id),
+		model.NewCategoryName("テストカテゴリー"),
 	)
 	require.NoError(t, err1)
 
 	tests := []struct {
 		name    string
 		args    args
-		matcher func(t *testing.T, expected *model.POSTCategoryModel, got *model.POSTCategoryModel, err error)
+		matcher func(t *testing.T, expected *model.CategoryModel, got *model.CategoryModel, err error)
 
 		// 事前に登録するデータ
 		beforeCreate func(t *testing.T, ctx context.Context, client *ent.Client)
@@ -104,7 +104,7 @@ func Test_CategoryRepository_FindByID(t *testing.T) {
 				ctx: ctx,
 				id:  id,
 			},
-			matcher: func(t *testing.T, expected *model.POSTCategoryModel, got *model.POSTCategoryModel, err error) {
+			matcher: func(t *testing.T, expected *model.CategoryModel, got *model.CategoryModel, err error) {
 				assert.NoError(t, err)
 				assert.NotEmpty(t, got)
 				assert.Equal(t, expected, got)

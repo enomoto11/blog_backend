@@ -23,18 +23,18 @@ func Test_CategoryService_CreateCategory(t *testing.T) {
 
 	id := rand.Int63n(1000) + 1
 
-	m1, err1 := model.NewPOSTCategoryAfterCreated(
-		model.NewPOSTCategoryID(id),
-		model.NewPOSTCategoryName("テストカテゴリー"),
+	m1, err1 := model.NewCategoryAfterCreated(
+		model.NewCategoryID(id),
+		model.NewCategoryName("テストカテゴリー"),
 	)
 	require.NoError(t, err1)
 
 	tests := []struct {
 		name          string
 		args          args
-		want          *model.POSTCategoryModel
-		prepareMockFn func(*testing.T, *categoryServiceMocks, *model.POSTCategoryModel, args)
-		matcher       func(*testing.T, *model.POSTCategoryModel, *model.POSTCategoryModel, error)
+		want          *model.CategoryModel
+		prepareMockFn func(*testing.T, *categoryServiceMocks, *model.CategoryModel, args)
+		matcher       func(*testing.T, *model.CategoryModel, *model.CategoryModel, error)
 	}{
 		{
 			name: "正常系：テストカテゴリーを登録する",
@@ -45,20 +45,20 @@ func Test_CategoryService_CreateCategory(t *testing.T) {
 				},
 			},
 			want: m1,
-			prepareMockFn: func(t *testing.T, mocks *categoryServiceMocks, category *model.POSTCategoryModel, args args) {
+			prepareMockFn: func(t *testing.T, mocks *categoryServiceMocks, category *model.CategoryModel, args args) {
 				mocks.categoryRepo.EXPECT().Create(args.ctx,
 					NewCmpMatcher(
 						category,
-						cmp.AllowUnexported(model.POSTCategoryModel{}),
-						cmpopts.IgnoreFields(model.POSTCategoryModel{}, "id"),
+						cmp.AllowUnexported(model.CategoryModel{}),
+						cmpopts.IgnoreFields(model.CategoryModel{}, "id"),
 					),
 				).Return(category, nil)
 			},
-			matcher: func(t *testing.T, expected *model.POSTCategoryModel, got *model.POSTCategoryModel, err error) {
+			matcher: func(t *testing.T, expected *model.CategoryModel, got *model.CategoryModel, err error) {
 				// idは自動採番なので、比較対象から除外する
 				opts := []cmp.Option{
-					cmp.AllowUnexported(model.POSTCategoryModel{}),
-					cmpopts.IgnoreFields(model.POSTCategoryModel{}, "id"),
+					cmp.AllowUnexported(model.CategoryModel{}),
+					cmpopts.IgnoreFields(model.CategoryModel{}, "id"),
 				}
 				diff := cmp.Diff(expected, got, opts...)
 
