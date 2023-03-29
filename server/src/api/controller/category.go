@@ -46,8 +46,10 @@ func (c *categoryController) createCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "success in creating new category",
-		"result":  result,
-	})
+	res := createdCategoryResponse{
+		ID:   result.GetID(),
+		Name: result.GetName(),
+	}
+
+	ctx.JSON(http.StatusCreated, res)
 }

@@ -36,9 +36,9 @@ func (c *userController) findAllUsers(ctx *gin.Context) {
 		return
 	}
 
-	response := convertGETUserModelsToAllUserResponse(result)
+	res := convertGETUserModelsToAllUserResponse(result)
 
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusOK, res)
 }
 
 func convertGETUserModelsToAllUserResponse(models []*model.GETUserModel) GETAllUserResponse {
@@ -76,8 +76,12 @@ func (c *userController) createUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "success in creating new user",
-		"result":  result,
-	})
+	res := createdUserResponse{
+		ID:        result.GetID(),
+		FirstName: result.GetFirstName(),
+		LastName:  result.GetLastName(),
+		Email:     result.GetEmail(),
+	}
+
+	ctx.JSON(http.StatusCreated, res)
 }

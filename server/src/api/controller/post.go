@@ -46,8 +46,13 @@ func (c *postController) createPost(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "success in creating new post",
-		"result":  result,
-	})
+	res := createdPostResponse{
+		ID:         result.GetID(),
+		Title:      result.GetTitle(),
+		Body:       result.GetBody(),
+		CategoryID: result.GetCategoryID(),
+		UserID:     result.GetUserID(),
+	}
+
+	ctx.JSON(http.StatusCreated, res)
 }
