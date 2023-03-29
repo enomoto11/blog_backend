@@ -110,6 +110,107 @@ func Test_PostService_CreatePost(t *testing.T) {
 	}
 }
 
+func Test_PostService_FindAllPosts(t *testing.T) {
+	type args struct {
+		ctx context.Context
+	}
+
+	ctx := context.Background()
+
+	id1 := uuid.New()
+	id2 := uuid.New()
+	categoryId := rand.Int63n(1000) + 1
+	userId := uuid.New()
+
+	m1, err1 := model.NewPost(
+		model.NewPostID(id1),
+		model.NewPostTitle("テストタイトル"),
+		model.NewPostBody("テスト本文"),
+		model.NewPostCategoryID(categoryId),
+		model.NewPostUserID(userId),
+	)
+	require.NoError(t, err1)
+
+	m2, err2 := model.NewPost(
+		model.NewPostID(id2),
+		model.NewPostTitle("テストタイトル2"),
+		model.NewPostBody("テスト本文2"),
+		model.NewPostCategoryID(categoryId),
+		model.NewPostUserID(userId),
+	)
+	require.NoError(t, err2)
+
+	tests := []struct {
+		name          string
+		args          args
+		want          []*model.PostModel
+		prepareMockFn func(*testing.T, *postServiceMocks, []*model.PostModel, args)
+		matcher       func(*testing.T, []*model.PostModel, []*model.PostModel, error)
+	}{
+		{
+			name: "正常系：テスト記事を全件取得する",
+			args: args{
+				ctx: ctx,
+			},
+			want: []*model.PostModel{m1, m2},
+			prepareMockFn: func(t *testing.T, mocks *postServiceMocks, posts []*model.PostModel, args args) {
+				mocks.postRepo.EXPECT().FindAll(args.ctx).Return(posts, nil)
+			},
+			matcher: func(t *testing.T, expected []*model.PostModel, got []*model.PostModel, err error) {
+				// idは自動採番なので、比較対象から除外する
+				opts := []cmp.Option{
+					cmp.AllowUnexported(model.PostModel{}),
+					cmpopts.IgnoreFields(model.PostModel{}, "id"),
+				}
+				diff := cmp.Diff(expected, got, opts...)
+
+				assert.NoError(t, err)
+				assert.NotEmpty(t, got)
+				assert.Empty(t, diff)
+			},
+		},
+
+		{
+			name: "正常系：テスト記事を全件取得する（0件）",
+			args: args{
+				ctx: ctx,
+			},
+			want: nil,
+			prepareMockFn: func(t *testing.T, mocks *postServiceMocks, posts []*model.PostModel, args args) {
+				mocks.postRepo.EXPECT().FindAll(args.ctx).Return(posts, nil)
+			},
+			matcher: func(t *testing.T, expected []*model.PostModel, got []*model.PostModel, err error) {
+				// idは自動採番なので、比較対象から除外する
+				opts := []cmp.Option{
+					cmp.AllowUnexported(model.PostModel{}),
+					cmpopts.IgnoreFields(model.PostModel{}, "id"),
+				}
+				diff := cmp.Diff(expected, got, opts...)
+
+				assert.NoError(t, err)
+				assert.Empty(t, got)
+				assert.Empty(t, diff)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			service, mocks := getPostServiceMocks(ctrl)
+			tt.prepareMockFn(t, mocks, tt.want, tt.args)
+
+			// Act
+			got, err := service.FindAllPosts(tt.args.ctx)
+
+			// Assert
+			tt.matcher(t, tt.want, got, err)
+		})
+	}
+}
+
 type postServiceMocks struct {
 	postRepo     *mock_repository.MockPostRepository
 	userRepo     *mock_repository.MockUserRepository
