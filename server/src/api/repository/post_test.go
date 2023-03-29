@@ -15,19 +15,19 @@ import (
 func Test_PosrRepository_Create(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		m   *model.POSTPostModel
+		m   *model.PostModel
 	}
 
 	id := uuid.New()
 	userId := uuid.New()
 	categoryId := rand.Int63n(1000) + 1
 
-	m1, err1 := model.NewPOSTPost(
-		model.NewPOSTPostID(id),
-		model.NewPOSTPostTitle("テストタイトル"),
-		model.NewPOSTPostBody("テスト本文"),
-		model.NewPOSTPostUserID(userId),
-		model.NewPOSTPostCategoryID(categoryId),
+	m1, err1 := model.NewPost(
+		model.NewPostID(id),
+		model.NewPostTitle("テストタイトル"),
+		model.NewPostBody("テスト本文"),
+		model.NewPostUserID(userId),
+		model.NewPostCategoryID(categoryId),
 	)
 	require.NoError(t, err1)
 
@@ -35,7 +35,7 @@ func Test_PosrRepository_Create(t *testing.T) {
 		name      string
 		args      args
 		prepareFn func(t *testing.T, client *ent.Client, args args)
-		matcher   func(t *testing.T, expected *model.POSTPostModel, got *model.POSTPostModel, err error)
+		matcher   func(t *testing.T, expected *model.PostModel, got *model.PostModel, err error)
 	}{
 		{
 			name: "正常系：テスト記事を登録する",
@@ -59,7 +59,7 @@ func Test_PosrRepository_Create(t *testing.T) {
 					Save(args.ctx)
 				require.NoError(t, err)
 			},
-			matcher: func(t *testing.T, expected *model.POSTPostModel, got *model.POSTPostModel, err error) {
+			matcher: func(t *testing.T, expected *model.PostModel, got *model.PostModel, err error) {
 				assert.NoError(t, err)
 				assert.Equal(t, expected, got)
 			},

@@ -10,7 +10,7 @@ import (
 )
 
 type PostService interface {
-	CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.POSTPostModel, error)
+	CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.PostModel, error)
 }
 
 type postService struct {
@@ -31,7 +31,7 @@ func NewPostService(
 	}
 }
 
-func (s *postService) CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.POSTPostModel, error) {
+func (s *postService) CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.PostModel, error) {
 	user, err := s.userRepo.FindByID(ctx, rb.UserID)
 	if user == nil || err != nil {
 		internalError := error2.NewInternalError(http.StatusBadRequest, err)
@@ -44,11 +44,11 @@ func (s *postService) CreatePost(ctx context.Context, rb request.POSTPostRequest
 		return nil, internalError
 	}
 
-	post, err := model.NewPOSTPost(
-		model.NewPOSTPostTitle(rb.Title),
-		model.NewPOSTPostBody(rb.Body),
-		model.NewPOSTPostCategoryID(rb.CategoryID),
-		model.NewPOSTPostUserID(rb.UserID),
+	post, err := model.NewPost(
+		model.NewPostTitle(rb.Title),
+		model.NewPostBody(rb.Body),
+		model.NewPostCategoryID(rb.CategoryID),
+		model.NewPostUserID(rb.UserID),
 	)
 	if err != nil {
 		internalError := error2.NewInternalError(http.StatusBadRequest, err)

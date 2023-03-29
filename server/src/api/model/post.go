@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type POSTPostModel struct {
+type PostModel struct {
 	id          uuid.UUID
 	title       string
 	body        string
@@ -10,10 +10,10 @@ type POSTPostModel struct {
 	category_id int64
 }
 
-type NewPOSTPostOption func(p *POSTPostModel)
+type NewPostOption func(p *PostModel)
 
-func NewPOSTPost(opts ...NewPOSTPostOption) (*POSTPostModel, error) {
-	post := &POSTPostModel{}
+func NewPost(opts ...NewPostOption) (*PostModel, error) {
+	post := &PostModel{}
 
 	// post作成時にデフォルトでuuidを設定。上書き可能。
 	post.id = uuid.Must(uuid.NewRandom())
@@ -28,57 +28,57 @@ func NewPOSTPost(opts ...NewPOSTPostOption) (*POSTPostModel, error) {
 	return post, nil
 }
 
-func NewPOSTPostID(id uuid.UUID) NewPOSTPostOption {
-	return func(p *POSTPostModel) {
+func NewPostID(id uuid.UUID) NewPostOption {
+	return func(p *PostModel) {
 		p.id = id
 	}
 }
 
-func NewPOSTPostTitle(title string) NewPOSTPostOption {
-	return func(p *POSTPostModel) {
+func NewPostTitle(title string) NewPostOption {
+	return func(p *PostModel) {
 		p.title = title
 	}
 }
 
-func NewPOSTPostBody(body string) NewPOSTPostOption {
-	return func(p *POSTPostModel) {
+func NewPostBody(body string) NewPostOption {
+	return func(p *PostModel) {
 		p.body = body
 	}
 }
 
-func NewPOSTPostUserID(user_id uuid.UUID) NewPOSTPostOption {
-	return func(p *POSTPostModel) {
+func NewPostUserID(user_id uuid.UUID) NewPostOption {
+	return func(p *PostModel) {
 		p.user_id = user_id
 	}
 }
 
-func NewPOSTPostCategoryID(category_id int64) NewPOSTPostOption {
-	return func(p *POSTPostModel) {
+func NewPostCategoryID(category_id int64) NewPostOption {
+	return func(p *PostModel) {
 		p.category_id = category_id
 	}
 }
 
-func (post *POSTPostModel) GetID() uuid.UUID {
+func (post *PostModel) GetID() uuid.UUID {
 	return post.id
 }
 
-func (post *POSTPostModel) GetTitle() string {
+func (post *PostModel) GetTitle() string {
 	return post.title
 }
 
-func (post *POSTPostModel) GetBody() string {
+func (post *PostModel) GetBody() string {
 	return post.body
 }
 
-func (post *POSTPostModel) GetUserID() uuid.UUID {
+func (post *PostModel) GetUserID() uuid.UUID {
 	return post.user_id
 }
 
-func (post *POSTPostModel) GetCategoryID() int64 {
+func (post *PostModel) GetCategoryID() int64 {
 	return post.category_id
 }
 
-func (post *POSTPostModel) validate() *ValidationErrors {
+func (post *PostModel) validate() *ValidationErrors {
 	var errors []*ValidationError
 	if err := post.isIDValid(); err != nil {
 		errors = append(errors, err)
@@ -99,35 +99,35 @@ func (post *POSTPostModel) validate() *ValidationErrors {
 	return validationErrorSliceToValidationErrors(errors)
 }
 
-func (post *POSTPostModel) isIDValid() *ValidationError {
+func (post *PostModel) isIDValid() *ValidationError {
 	if post.id == uuid.Nil {
 		return NewValidationError("empty UUID in post ID is not allowed")
 	}
 	return nil
 }
 
-func (post *POSTPostModel) isTitleValid() *ValidationError {
+func (post *PostModel) isTitleValid() *ValidationError {
 	if post.title == "" {
 		return NewValidationError("empty string in post title is not allowed")
 	}
 	return nil
 }
 
-func (post *POSTPostModel) isBodyValid() *ValidationError {
+func (post *PostModel) isBodyValid() *ValidationError {
 	if post.body == "" {
 		return NewValidationError("empty string in post body is not allowed")
 	}
 	return nil
 }
 
-func (post *POSTPostModel) isUserIDValid() *ValidationError {
+func (post *PostModel) isUserIDValid() *ValidationError {
 	if post.user_id == uuid.Nil {
 		return NewValidationError("empty UUID in post user ID is not allowed")
 	}
 	return nil
 }
 
-func (post *POSTPostModel) isCategoryIDValid() *ValidationError {
+func (post *PostModel) isCategoryIDValid() *ValidationError {
 	if post.category_id == 0 {
 		return NewValidationError("empty number in post category ID is not allowed")
 	}

@@ -36,10 +36,10 @@ func (m *MockPostRepository) EXPECT() *MockPostRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m_2 *MockPostRepository) Create(ctx context.Context, m *model.POSTPostModel) (*model.POSTPostModel, error) {
+func (m_2 *MockPostRepository) Create(ctx context.Context, m *model.PostModel) (*model.PostModel, error) {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "Create", ctx, m)
-	ret0, _ := ret[0].(*model.POSTPostModel)
+	ret0, _ := ret[0].(*model.PostModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -26,12 +26,12 @@ func Test_PostService_CreatePost(t *testing.T) {
 	categoryId := rand.Int63n(1000) + 1
 	userId := uuid.New()
 
-	m1, err1 := model.NewPOSTPost(
-		model.NewPOSTPostID(id),
-		model.NewPOSTPostTitle("テストタイトル"),
-		model.NewPOSTPostBody("テスト本文"),
-		model.NewPOSTPostCategoryID(categoryId),
-		model.NewPOSTPostUserID(userId),
+	m1, err1 := model.NewPost(
+		model.NewPostID(id),
+		model.NewPostTitle("テストタイトル"),
+		model.NewPostBody("テスト本文"),
+		model.NewPostCategoryID(categoryId),
+		model.NewPostUserID(userId),
 	)
 	require.NoError(t, err1)
 
@@ -52,9 +52,9 @@ func Test_PostService_CreatePost(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		want          *model.POSTPostModel
-		prepareMockFn func(*testing.T, *postServiceMocks, *model.POSTPostModel, args)
-		matcher       func(*testing.T, *model.POSTPostModel, *model.POSTPostModel, error)
+		want          *model.PostModel
+		prepareMockFn func(*testing.T, *postServiceMocks, *model.PostModel, args)
+		matcher       func(*testing.T, *model.PostModel, *model.PostModel, error)
 	}{
 		{
 			name: "正常系：テスト記事を登録する",
@@ -68,21 +68,21 @@ func Test_PostService_CreatePost(t *testing.T) {
 				},
 			},
 			want: m1,
-			prepareMockFn: func(t *testing.T, mocks *postServiceMocks, post *model.POSTPostModel, args args) {
+			prepareMockFn: func(t *testing.T, mocks *postServiceMocks, post *model.PostModel, args args) {
 				mocks.userRepo.EXPECT().FindByID(args.ctx, args.rb.UserID).Return(user1, nil)
 				mocks.categoryRepo.EXPECT().FindByID(args.ctx, args.rb.CategoryID).Return(category1, nil)
 				mocks.postRepo.EXPECT().Create(args.ctx,
 					NewCmpMatcher(
 						post,
-						cmp.AllowUnexported(model.POSTPostModel{}),
-						cmpopts.IgnoreFields(model.POSTPostModel{}, "id"),
+						cmp.AllowUnexported(model.PostModel{}),
+						cmpopts.IgnoreFields(model.PostModel{}, "id"),
 					)).Return(post, nil)
 			},
-			matcher: func(t *testing.T, expected *model.POSTPostModel, got *model.POSTPostModel, err error) {
+			matcher: func(t *testing.T, expected *model.PostModel, got *model.PostModel, err error) {
 				// idは自動採番なので、比較対象から除外する
 				opts := []cmp.Option{
-					cmp.AllowUnexported(model.POSTPostModel{}),
-					cmpopts.IgnoreFields(model.POSTPostModel{}, "id"),
+					cmp.AllowUnexported(model.PostModel{}),
+					cmpopts.IgnoreFields(model.PostModel{}, "id"),
 				}
 				diff := cmp.Diff(expected, got, opts...)
 
