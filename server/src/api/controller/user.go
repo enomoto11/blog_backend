@@ -25,8 +25,8 @@ func NewUserController(userService service.UserService) UserController {
 }
 
 func (c *userController) RegisterHandlers(r gin.IRouter) {
-	r.GET("users", c.findAllUsers)
-	r.POST("user/new", c.createUser)
+	r.GET("/users", c.findAllUsers)
+	r.POST("/user/new", c.createUser)
 }
 
 func (c *userController) findAllUsers(ctx *gin.Context) {
