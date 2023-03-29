@@ -25,42 +25,20 @@ func NewUserController(userService service.UserService) UserController {
 }
 
 func (c *userController) RegisterHandlers(r gin.IRouter) {
-	r.GET("users", func(ctx *gin.Context) {
-		result, err := c.userService.FindAllUsers(ctx)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+	r.GET("users", c.findAllUsers)
+	r.POST("user/new", c.createUser)
+}
 
-		response := convertGETUserModelsToAllUserResponse(result)
+func (c *userController) findAllUsers(ctx *gin.Context) {
+	result, err := c.userService.FindAllUsers(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-		ctx.JSON(http.StatusOK, response)
-	})
+	response := convertGETUserModelsToAllUserResponse(result)
 
-	r.POST("user/new", func(ctx *gin.Context) {
-		var requestBody request.POSTUserRequestBody
-		if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		validate := validator.New()
-		if err := validate.Struct(requestBody); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		result, err := c.userService.CreateUser(ctx, requestBody)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.JSON(http.StatusCreated, gin.H{
-			"message": "success in creating new user",
-			"result":  result,
-		})
-	})
+	ctx.JSON(http.StatusOK, response)
 }
 
 func convertGETUserModelsToAllUserResponse(models []*model.GETUserModel) GETAllUserResponse {
@@ -77,4 +55,29 @@ func convertGETUserModelsToAllUserResponse(models []*model.GETUserModel) GETAllU
 	}
 
 	return response
+}
+
+func (c *userController) createUser(ctx *gin.Context) {
+	var requestBody request.POSTUserRequestBody
+	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(requestBody); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := c.userService.CreateUser(ctx, requestBody)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "success in creating new user",
+		"result":  result,
+	})
 }
