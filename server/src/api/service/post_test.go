@@ -43,9 +43,9 @@ func Test_PostService_CreatePost(t *testing.T) {
 	)
 	require.NoError(t, ue1)
 
-	category1, ce1 := model.NewPOSTCategoryAfterCreated(
-		model.NewPOSTCategoryID(categoryId),
-		model.NewPOSTCategoryName("テストカテゴリ"),
+	category1, ce1 := model.NewCategoryAfterCreated(
+		model.NewCategoryID(categoryId),
+		model.NewCategoryName("テストカテゴリ"),
 	)
 	require.NoError(t, ce1)
 

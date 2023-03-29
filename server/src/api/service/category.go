@@ -10,7 +10,7 @@ import (
 )
 
 type CategoryService interface {
-	CreateCategory(ctx context.Context, rb request.POSTCategoryRequestBody) (*model.POSTCategoryModel, error)
+	CreateCategory(ctx context.Context, rb request.POSTCategoryRequestBody) (*model.CategoryModel, error)
 }
 
 type categoryService struct {
@@ -23,9 +23,9 @@ func NewCategoryService(categoryRepo repository.CategoryRepository) CategoryServ
 	}
 }
 
-func (s *categoryService) CreateCategory(ctx context.Context, rb request.POSTCategoryRequestBody) (*model.POSTCategoryModel, error) {
-	category, err := model.NewPOSTCategoryBeforeCreated(
-		model.NewPOSTCategoryName(rb.Name),
+func (s *categoryService) CreateCategory(ctx context.Context, rb request.POSTCategoryRequestBody) (*model.CategoryModel, error) {
+	category, err := model.NewCategoryBeforeCreated(
+		model.NewCategoryName(rb.Name),
 	)
 	if err != nil {
 		internalError := error2.NewInternalError(http.StatusBadRequest, err)

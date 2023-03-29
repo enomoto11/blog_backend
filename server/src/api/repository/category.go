@@ -8,8 +8,8 @@ import (
 )
 
 type CategoryRepository interface {
-	Create(ctx context.Context, m *model.POSTCategoryModel) (*model.POSTCategoryModel, error)
-	FindByID(ctx context.Context, id int64) (*model.POSTCategoryModel, error)
+	Create(ctx context.Context, m *model.CategoryModel) (*model.CategoryModel, error)
+	FindByID(ctx context.Context, id int64) (*model.CategoryModel, error)
 }
 
 type categoryRepository struct {
@@ -20,7 +20,7 @@ func NewCategoryRepository(client *ent.Client) CategoryRepository {
 	return &categoryRepository{client}
 }
 
-func (r *categoryRepository) Create(ctx context.Context, m *model.POSTCategoryModel) (*model.POSTCategoryModel, error) {
+func (r *categoryRepository) Create(ctx context.Context, m *model.CategoryModel) (*model.CategoryModel, error) {
 	entity, err := r.client.Category.Create().
 		SetName(m.GetName()).
 		Save(ctx)
@@ -32,7 +32,7 @@ func (r *categoryRepository) Create(ctx context.Context, m *model.POSTCategoryMo
 	return categoryModelFromEntity(entity)
 }
 
-func (r *categoryRepository) FindByID(ctx context.Context, id int64) (*model.POSTCategoryModel, error) {
+func (r *categoryRepository) FindByID(ctx context.Context, id int64) (*model.CategoryModel, error) {
 	entity, err := r.client.Category.Query().Where(category.ID(id)).Only(ctx)
 
 	if err != nil {
@@ -42,11 +42,11 @@ func (r *categoryRepository) FindByID(ctx context.Context, id int64) (*model.POS
 	return categoryModelFromEntity(entity)
 }
 
-func categoryModelFromEntity(entity *ent.Category) (*model.POSTCategoryModel, error) {
-	opts := []model.NewPOSTCategoryOption{
-		model.NewPOSTCategoryID(entity.ID),
-		model.NewPOSTCategoryName(entity.Name),
+func categoryModelFromEntity(entity *ent.Category) (*model.CategoryModel, error) {
+	opts := []model.NewCategoryOption{
+		model.NewCategoryID(entity.ID),
+		model.NewCategoryName(entity.Name),
 	}
 
-	return model.NewPOSTCategoryAfterCreated(opts...)
+	return model.NewCategoryAfterCreated(opts...)
 }

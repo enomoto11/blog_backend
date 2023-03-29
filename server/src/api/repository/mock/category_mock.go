@@ -36,10 +36,10 @@ func (m *MockCategoryRepository) EXPECT() *MockCategoryRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m_2 *MockCategoryRepository) Create(ctx context.Context, m *model.POSTCategoryModel) (*model.POSTCategoryModel, error) {
+func (m_2 *MockCategoryRepository) Create(ctx context.Context, m *model.CategoryModel) (*model.CategoryModel, error) {
 	m_2.ctrl.T.Helper()
 	ret := m_2.ctrl.Call(m_2, "Create", ctx, m)
-	ret0, _ := ret[0].(*model.POSTCategoryModel)
+	ret0, _ := ret[0].(*model.CategoryModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockCategoryRepositoryMockRecorder) Create(ctx, m interface{}) *gomock
 }
 
 // FindByID mocks base method.
-func (m *MockCategoryRepository) FindByID(ctx context.Context, id int64) (*model.POSTCategoryModel, error) {
+func (m *MockCategoryRepository) FindByID(ctx context.Context, id int64) (*model.CategoryModel, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", ctx, id)
-	ret0, _ := ret[0].(*model.POSTCategoryModel)
+	ret0, _ := ret[0].(*model.CategoryModel)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
