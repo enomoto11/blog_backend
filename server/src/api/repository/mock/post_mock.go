@@ -49,3 +49,18 @@ func (mr *MockPostRepositoryMockRecorder) Create(ctx, m interface{}) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPostRepository)(nil).Create), ctx, m)
 }
+
+// FindAll mocks base method.
+func (m *MockPostRepository) FindAll(ctx context.Context) ([]*model.PostModel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret0, _ := ret[0].([]*model.PostModel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAll indicates an expected call of FindAll.
+func (mr *MockPostRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockPostRepository)(nil).FindAll), ctx)
+}

@@ -8,6 +8,7 @@ import (
 
 type PostRepository interface {
 	Create(ctx context.Context, m *model.PostModel) (*model.PostModel, error)
+	FindAll(ctx context.Context) ([]*model.PostModel, error)
 }
 
 type postRepository struct {
@@ -44,4 +45,22 @@ func postModelFromEntity(entity *ent.Post) (*model.PostModel, error) {
 	}
 
 	return model.NewPost(opts...)
+}
+
+func (r *postRepository) FindAll(ctx context.Context) ([]*model.PostModel, error) {
+	entities, err := r.client.Post.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*model.PostModel
+	for _, entity := range entities {
+		post, err := postModelFromEntity(entity)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 }
