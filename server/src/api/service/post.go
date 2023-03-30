@@ -7,12 +7,15 @@ import (
 	"blog/api/repository"
 	"context"
 	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type PostService interface {
 	CreatePost(ctx context.Context, rb request.POSTPostRequestBody) (*model.PostModel, error)
 	FindAllPosts(ctx context.Context) ([]*model.PostModel, error)
-	FindByCategoryID(ctx context.Context) ([]*model.PostModel, error)
+	FindByCategoryID(ctx *gin.Context) ([]*model.PostModel, error)
 }
 
 type postService struct {
@@ -76,8 +79,13 @@ func (s *postService) FindAllPosts(ctx context.Context) ([]*model.PostModel, err
 	return result, nil
 }
 
-func (s *postService) FindByCategoryID(ctx context.Context) ([]*model.PostModel, error) {
-	categoryID := ctx.Value("categoryID").(int64)
+func (s *postService) FindByCategoryID(ctx *gin.Context) ([]*model.PostModel, error) {
+	params := ctx.Param("id")
+	categoryID, err := strconv.ParseInt(params, 10, 64)
+	if err != nil {
+		internalError := error2.NewInternalError(http.StatusBadRequest, err)
+		return nil, internalError
+	}
 
 	result, err := s.postRepo.FindByCategoryID(ctx, categoryID)
 	if err != nil {
