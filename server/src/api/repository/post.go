@@ -3,12 +3,14 @@ package repository
 import (
 	"blog/api/model"
 	"blog/ent"
+	"blog/ent/post"
 	"context"
 )
 
 type PostRepository interface {
 	Create(ctx context.Context, m *model.PostModel) (*model.PostModel, error)
 	FindAll(ctx context.Context) ([]*model.PostModel, error)
+	FindByCategoryID(ctx context.Context, categoryID int64) ([]*model.PostModel, error)
 }
 
 type postRepository struct {
@@ -49,6 +51,24 @@ func postModelFromEntity(entity *ent.Post) (*model.PostModel, error) {
 
 func (r *postRepository) FindAll(ctx context.Context) ([]*model.PostModel, error) {
 	entities, err := r.client.Post.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*model.PostModel
+	for _, entity := range entities {
+		post, err := postModelFromEntity(entity)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+func (r *postRepository) FindByCategoryID(ctx context.Context, categoryID int64) ([]*model.PostModel, error) {
+	entities, err := r.client.Post.Query().Where(post.CategoryID(categoryID)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
