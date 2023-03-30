@@ -26,6 +26,7 @@ func NewPostController(postService service.PostService) PostController {
 func (c *postController) RegisterHandlers(r gin.IRouter) {
 	r.POST("/post/new", c.createPost)
 	r.GET("/posts", c.findAllPosts)
+	r.GET("/posts/category/:id", c.findByCategoryID)
 }
 
 func (c *postController) createPost(ctx *gin.Context) {
@@ -60,6 +61,27 @@ func (c *postController) createPost(ctx *gin.Context) {
 
 func (c *postController) findAllPosts(ctx *gin.Context) {
 	results, err := c.postService.FindAllPosts(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var res allpostsResponse
+	for _, result := range results {
+		res = append(res, post{
+			ID:         result.GetID(),
+			Title:      result.GetTitle(),
+			Body:       result.GetBody(),
+			CategoryID: result.GetCategoryID(),
+			UserID:     result.GetUserID(),
+		})
+	}
+
+	ctx.JSON(http.StatusCreated, res)
+}
+
+func (c *postController) findByCategoryID(ctx *gin.Context) {
+	results, err := c.postService.FindByCategoryID(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

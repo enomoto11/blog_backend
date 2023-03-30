@@ -64,3 +64,18 @@ func (mr *MockPostRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockPostRepository)(nil).FindAll), ctx)
 }
+
+// FindByCategoryID mocks base method.
+func (m *MockPostRepository) FindByCategoryID(ctx context.Context, categoryID int64) ([]*model.PostModel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByCategoryID", ctx, categoryID)
+	ret0, _ := ret[0].([]*model.PostModel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByCategoryID indicates an expected call of FindByCategoryID.
+func (mr *MockPostRepositoryMockRecorder) FindByCategoryID(ctx, categoryID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByCategoryID", reflect.TypeOf((*MockPostRepository)(nil).FindByCategoryID), ctx, categoryID)
+}

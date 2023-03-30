@@ -218,3 +218,140 @@ func Test_PosrRepository_FindAll(t *testing.T) {
 		})
 	}
 }
+
+func Test_PosrRepository_FindByCategoryID(t *testing.T) {
+	type args struct {
+		ctx        context.Context
+		categoryID int64
+	}
+
+	id1 := uuid.New()
+	id2 := uuid.New()
+	categoryID := rand.Int63n(1000) + 1
+	userID := uuid.New()
+
+	p1, err1 := model.NewPost(
+		model.NewPostID(id1),
+		model.NewPostTitle("テストタイトル"),
+		model.NewPostBody("テスト本文"),
+		model.NewPostUserID(userID),
+		model.NewPostCategoryID(categoryID),
+	)
+	require.NoError(t, err1)
+
+	p2, err2 := model.NewPost(
+		model.NewPostID(id2),
+		model.NewPostTitle("テストタイトル2"),
+		model.NewPostBody("テスト本文2"),
+		model.NewPostUserID(userID),
+		model.NewPostCategoryID(categoryID),
+	)
+	require.NoError(t, err2)
+
+	tests := []struct {
+		name      string
+		args      args
+		expected  []*model.PostModel
+		prepareFn func(t *testing.T, client *ent.Client, args args)
+		matcher   func(t *testing.T, expected []*model.PostModel, got []*model.PostModel, err error)
+	}{
+		{
+			name: "正常系：カテゴリIDに紐づく記事を全件取得する",
+			args: args{
+				ctx:        context.Background(),
+				categoryID: categoryID,
+			},
+			expected: []*model.PostModel{
+				p1,
+				p2,
+			},
+			prepareFn: func(t *testing.T, client *ent.Client, args args) {
+				_, err := client.User.Create().
+					SetID(userID).
+					SetFirstName("レオリオ").
+					SetLastName("パラディナイト").
+					SetEmail("p.reolio@hunter.com").
+					SetPassword("hunterhunter").
+					Save(args.ctx)
+				require.NoError(t, err)
+
+				_, err = client.Category.Create().
+					SetID(categoryID).
+					SetName("テストカテゴリ").
+					Save(args.ctx)
+				require.NoError(t, err)
+
+				_, err = client.Post.Create().
+					SetID(id1).
+					SetTitle("テストタイトル").
+					SetBody("テスト本文").
+					SetUserID(userID).
+					SetCategoryID(categoryID).
+					Save(args.ctx)
+				require.NoError(t, err)
+
+				_, err = client.Post.Create().
+					SetID(id2).
+					SetTitle("テストタイトル2").
+					SetBody("テスト本文2").
+					SetUserID(userID).
+					SetCategoryID(categoryID).
+					Save(args.ctx)
+				require.NoError(t, err)
+			},
+
+			matcher: func(t *testing.T, expected []*model.PostModel, got []*model.PostModel, err error) {
+				assert.NoError(t, err)
+				assert.Equal(t, expected, got)
+			},
+		},
+		{
+			name: "正常系：カテゴリIDに紐づく記事を全件取得する（記事が存在しない）",
+			args: args{
+				ctx:        context.Background(),
+				categoryID: categoryID,
+			},
+			expected: nil,
+			prepareFn: func(t *testing.T, client *ent.Client, args args) {
+				_, err := client.User.Create().
+					SetID(userID).
+					SetFirstName("レオリオ").
+					SetLastName("パラディナイト").
+					SetEmail("p.reolio@hunter.com").
+					SetPassword("hunterhunter").
+					Save(args.ctx)
+				require.NoError(t, err)
+
+				_, err = client.Category.Create().
+					SetID(categoryID).
+					SetName("テストカテゴリ").
+					Save(args.ctx)
+				require.NoError(t, err)
+			},
+
+			matcher: func(t *testing.T, expected []*model.PostModel, got []*model.PostModel, err error) {
+				assert.NoError(t, err)
+				assert.Equal(t, expected, got)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arange
+			client, err := InitializeEntClient(t)
+			defer func(client *ent.Client) {
+				_ = client.Close()
+			}(client)
+			require.NoError(t, err)
+			repo := &postRepository{client}
+			tt.prepareFn(t, client, tt.args)
+
+			// Action
+			got, err := repo.FindByCategoryID(tt.args.ctx, tt.args.categoryID)
+
+			// Assert
+			tt.matcher(t, tt.expected, got, err)
+		})
+	}
+}
