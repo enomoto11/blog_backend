@@ -50,7 +50,7 @@ func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.GET
 }
 
 func (r *userRepository) FindAll(ctx context.Context) ([]*model.GETUserModel, error) {
-	entities, err := r.client.User.Query().All(ctx)
+	entities, err := r.client.User.Query().Order(ent.Desc("created_at")).All(ctx)
 
 	if err != nil {
 		return nil, err

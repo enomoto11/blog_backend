@@ -154,7 +154,6 @@ func Test_UserRepository_FindAll(t *testing.T) {
 					SetPassword("jujutsukaisenn").
 					Save(ctx)
 				require.NoError(t, err)
-				entities = append(entities, entity1)
 
 				entity2, err := client.User.Create().
 					SetID(uuid.New()).
@@ -165,6 +164,7 @@ func Test_UserRepository_FindAll(t *testing.T) {
 					Save(ctx)
 				require.NoError(t, err)
 				entities = append(entities, entity2)
+				entities = append(entities, entity1)
 
 				models, _ := userModelsFromEntities(entities)
 

@@ -127,8 +127,8 @@ func Test_PosrRepository_FindAll(t *testing.T) {
 				ctx: context.Background(),
 			},
 			expected: []*model.PostModel{
-				p1,
 				p2,
+				p1,
 			},
 			prepareFn: func(t *testing.T, client *ent.Client, args args) {
 				_, err := client.User.Create().

@@ -50,7 +50,7 @@ func postModelFromEntity(entity *ent.Post) (*model.PostModel, error) {
 }
 
 func (r *postRepository) FindAll(ctx context.Context) ([]*model.PostModel, error) {
-	entities, err := r.client.Post.Query().All(ctx)
+	entities, err := r.client.Post.Query().Order(ent.Desc("created_at")).All(ctx)
 	if err != nil {
 		return nil, err
 	}
